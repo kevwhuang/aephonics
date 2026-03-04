@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Web engineering stack reference by aephonics. Covers framework, language, tooling, UI, animation, and infrastructure decisions."
+    />
+    <meta name="author" content="aephonics" />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <meta property="og:title" content="Web Engineering Stack" />
+    <meta
+      property="og:description"
+      content="Engineering stack reference: Astro, TypeScript, Supabase, Tailwind, GSAP, and more."
+    />
+    <meta property="og:type" content="website" />
+    <title>Web Engineering Stack</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --border: #1a1a1a;
+        --border-mid: #282828;
+        --text-1: #ebebeb;
+        --text-2: #c8c8c8;
+        --text-3: #7a7a7a;
+        --text-4: #505050;
+        --font: "IBM Plex Mono", "Courier New", monospace;
+        --xs: 12px;
+        --sm: 13px;
+        --md: 14px;
+        --base: 16px;
+        --lg: 20px;
+        --sp-sm: 8px;
+        --sp-md: 16px;
+        --sp-lg: 24px;
+        --sp-xl: 40px;
+        --sp-2xl: 64px;
+        --max-w: 1024px;
+        --max-w-lg: 1280px;
+        --rank: 32px;
+        --rank-sm: 28px;
+        --rank-lg: 40px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text-1);
+        font-family: var(--font);
+        min-height: 100vh;
+        padding: var(--sp-xl);
+      }
+
+      .stack {
+        margin-inline: auto;
+        max-width: var(--max-w);
+      }
+
+      .stack__header {
+        border-bottom: 1px solid var(--border-mid);
+        margin-bottom: var(--sp-xl);
+        padding-bottom: var(--sp-xl);
+      }
+      .stack__title {
+        font-size: var(--lg);
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .stack__meta {
+        color: var(--text-3);
+        font-size: var(--base);
+        letter-spacing: 0.12em;
+        margin-top: var(--sp-sm);
+        text-transform: uppercase;
+      }
+
+      .stack__section-title {
+        border-bottom: 1px solid var(--border);
+        color: var(--text-3);
+        font-size: var(--md);
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        padding: var(--sp-xl) 0 var(--sp-sm);
+        text-transform: uppercase;
+      }
+      .stack__section:first-of-type .stack__section-title {
+        padding-top: 0;
+      }
+      .stack__list {
+        list-style: none;
+      }
+
+      .stack__item {
+        border-bottom: 1px solid var(--border);
+        column-gap: var(--sp-lg);
+        display: grid;
+        grid-template-columns: var(--rank) 1fr;
+        padding: var(--sp-lg) 0;
+      }
+      .stack__rank {
+        color: var(--text-3);
+        font-size: var(--base);
+        padding-top: 2px;
+        text-align: right;
+        user-select: none;
+      }
+      .stack__content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--sp-sm);
+      }
+      .stack__item-header {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--sp-sm);
+      }
+      .stack__name {
+        font-size: var(--lg);
+        font-weight: 600;
+        letter-spacing: 0.03em;
+      }
+      .stack__notes {
+        color: var(--text-2);
+        font-size: var(--base);
+        line-height: 1.9;
+      }
+
+      .stack__badge {
+        border: 1px solid transparent;
+        border-radius: 2px;
+        font-size: var(--xs);
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        padding: 2px 6px;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .stack__badge--animation {
+        background: #180c00;
+        border-color: #301800;
+        color: #c07830;
+      }
+      .stack__badge--backend {
+        background: #081225;
+        border-color: #102245;
+        color: #4a70bf;
+      }
+      .stack__badge--components {
+        background: #081508;
+        border-color: #0f2510;
+        color: #4a8a5f;
+      }
+      .stack__badge--deployment {
+        background: #071a18;
+        border-color: #0d2c28;
+        color: #3d9288;
+      }
+      .stack__badge--dx {
+        background: #14100a;
+        border-color: #281e0e;
+        color: #a07848;
+      }
+      .stack__badge--e2e {
+        background: #0a0f1a;
+        border-color: #141f35;
+        color: #4a7ab8;
+      }
+      .stack__badge--editor {
+        background: #111;
+        border-color: #222;
+        color: #555;
+      }
+      .stack__badge--framework {
+        background: #130a28;
+        border-color: #261550;
+        color: #8b6fd4;
+      }
+      .stack__badge--language {
+        background: #080f20;
+        border-color: #102040;
+        color: #5580cc;
+      }
+      .stack__badge--runtime {
+        background: #071520;
+        border-color: #0e2535;
+        color: #4a8ab8;
+      }
+      .stack__badge--styling {
+        background: #041620;
+        border-color: #082535;
+        color: #2ea8c8;
+      }
+      .stack__badge--testing {
+        background: #0a1a0a;
+        border-color: #143014;
+        color: #4a9e4a;
+      }
+      .stack__badge--ui {
+        background: #071a0d;
+        border-color: #0d2e18;
+        color: #3d9460;
+      }
+      .stack__badge--vcs {
+        background: #0f0f18;
+        border-color: #1e1e35;
+        color: #7070c0;
+      }
+
+      .stack__copyright {
+        color: var(--text-4);
+        font-size: var(--sm);
+        letter-spacing: 0.12em;
+        padding: var(--sp-lg) 0;
+        text-transform: uppercase;
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding: var(--sp-lg) var(--sp-md);
+        }
+        .stack__item {
+          column-gap: var(--sp-md);
+          grid-template-columns: var(--rank-sm) 1fr;
+          padding: var(--sp-md) 0;
+        }
+      }
+
+      @media (min-width: 1536px) {
+        body {
+          padding: var(--sp-2xl);
+        }
+        .stack {
+          max-width: var(--max-w-lg);
+        }
+        .stack__item {
+          grid-template-columns: var(--rank-lg) 1fr;
+          column-gap: var(--sp-xl);
+          padding: var(--sp-xl) 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="stack">
+      <header class="stack__header">
+        <h1 class="stack__title">Web Engineering Stack</h1>
+        <p class="stack__meta">aephonics &middot; March 4, 2026</p>
+      </header>
+
+      <section class="stack__section" aria-label="Foundation">
+        <h2 class="stack__section-title">Foundation</h2>
+        <ol class="stack__list">
+          <li class="stack__item">
+            <span class="stack__rank">01</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">Astro</span>
+                <span class="stack__badge stack__badge--framework"
+                  >Framework</span
+                >
+              </div>
+              <p class="stack__notes">
+                Static-first framework that outputs zero JavaScript by default.
+                Interactive components hydrate in isolation as Astro islands,
+                leaving the rest of the page untouched. Each route manages its
+                own JS budget, which keeps performance predictable across
+                projects of varying complexity. Cross-island state is handled
+                with nanostores — framework-agnostic, under 1kb, and designed
+                specifically for this architecture.
+              </p>
+            </div>
+          </li>
+
+          <li class="stack__item">
+            <span class="stack__rank">02</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">TypeScript</span>
+                <span class="stack__badge stack__badge--language"
+                  >Language</span
+                >
+              </div>
+              <p class="stack__notes">
+                Used across every project without exception. Typed props,
+                schemas, and API responses catch shape mismatches and broken
+                references at compile time rather than in production. Astro
+                supports TypeScript natively, and the coverage significantly
+                improves output quality when working with AI coding tools.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="stack__section" aria-label="Development">
+        <h2 class="stack__section-title">Development</h2>
+        <ol class="stack__list">
+          <li class="stack__item">
+            <span class="stack__rank">03</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">Bun</span>
+                <span class="stack__badge stack__badge--runtime">Runtime</span>
+              </div>
+              <p class="stack__notes">
+                JavaScript runtime and package manager for local development.
+                Faster installs and dev server startup than Node across the
+                board. The full toolchain runs through it without modification.
+                Production targets Node on Netlify, so Bun-specific APIs are
+                kept out of application code.
+              </p>
+            </div>
+          </li>
+
+          <li class="stack__item">
+            <span class="stack__rank">04</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">VS Code</span>
+                <span class="stack__badge stack__badge--editor">Editor</span>
+              </div>
+              <p class="stack__notes">
+                Primary editor across all client work. Strong TypeScript
+                intellisense, dedicated Astro and Tailwind extensions, and tight
+                integration with the terminal-based toolchain. A consistent
+                setup across projects removes friction when switching between
+                engagements.
+              </p>
+            </div>
+          </li>
+
+          <li class="stack__item">
+            <span class="stack__rank">05</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">Claude Code</span>
+                <span class="stack__badge stack__badge--editor">Editor</span>
+              </div>
+              <p class="stack__notes">
+                AI coding agent running in the terminal with full codebase
+                context. Handles file scaffolding, multi-file edits, and large
+                refactors. TypeScript and Tailwind are the ideal pairing — typed
+                interfaces and colocated styles give it accurate context to
+                produce code that fits the existing codebase.
+              </p>
+            </div>
+          </li>
+
+          <li class="stack__item">
+            <span class="stack__rank">06</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">GitHub</span>
+                <span class="stack__badge stack__badge--vcs"
+                  >Version Control</span
+                >
+              </div>
+              <p class="stack__notes">
+                Version control and remote repository host for all projects.
+                Pull requests, Netlify branch previews, and Claude Code all
+                operate directly from the repository. GitHub Actions handles
+                CI/CD — automated checks run on every PR and block merges on
+                failure. The full pipeline is defined in .github/workflows and
+                version-controlled alongside the codebase.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="stack__section" aria-label="Infrastructure">
+        <h2 class="stack__section-title">Infrastructure</h2>
+        <ol class="stack__list">
+          <li class="stack__item">
+            <span class="stack__rank">07</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">Netlify</span>
+                <span class="stack__badge stack__badge--deployment"
+                  >Deployment</span
+                >
+              </div>
+              <p class="stack__notes">
+                Deployment and hosting for all Astro projects. Git-based
+                deploys, automatic SSL, edge-distributed assets, and per-branch
+                preview URLs on all plans. Netlify Functions handles any
+                server-side requirements beyond Astro SSR. No infrastructure to
+                provision or maintain.
+              </p>
+            </div>
+          </li>
+
+          <li class="stack__item">
+            <span class="stack__rank">08</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">Supabase</span>
+                <span class="stack__badge stack__badge--backend">Backend</span>
+              </div>
+              <p class="stack__notes">
+                Postgres database, auth, and file storage under one platform.
+                Data is accessed through Astro SSR endpoints via the TypeScript
+                client — no custom server required. Auth handles sessions and
+                access control out of the box. The Claude Code MCP integration
+                allows schema management and queries directly from the terminal
+                during development.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="stack__section" aria-label="UI">
+        <h2 class="stack__section-title">UI</h2>
+        <ol class="stack__list">
+          <li class="stack__item">
+            <span class="stack__rank">09</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">Tailwind</span>
+                <span class="stack__badge stack__badge--styling">Styling</span>
+              </div>
+              <p class="stack__notes">
+                Utility classes written directly in markup, colocated with the
+                component they style. Extended per project with custom design
+                tokens — brand colors, type scale, spacing. No separate
+                stylesheet to maintain, no naming conventions to enforce, and
+                styles are always visible in context when working with AI tools.
+              </p>
+            </div>
+          </li>
+
+          <li class="stack__item">
+            <span class="stack__rank">10</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">React</span>
+                <span class="stack__badge stack__badge--ui">UI Language</span>
+              </div>
+              <p class="stack__notes">
+                Used only where client-side state or interaction is required,
+                scoped to Astro islands. The surrounding page stays as static
+                HTML. This keeps JavaScript proportional to actual UI
+                requirements rather than loading a full framework as the
+                default.
+              </p>
+            </div>
+          </li>
+
+          <li class="stack__item">
+            <span class="stack__rank">11</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">shadcn/ui</span>
+                <span class="stack__badge stack__badge--components"
+                  >Components</span
+                >
+              </div>
+              <p class="stack__notes">
+                Components are copied into the codebase rather than installed as
+                a package. Built on Radix UI for accessibility and Tailwind for
+                styling, consistent with the rest of the stack. Every component
+                is fully editable and not subject to upstream breaking changes.
+                Lucide ships as the default icon set — tree-shakeable and
+                visually consistent with the shadcn design language.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="stack__section" aria-label="Animation">
+        <h2 class="stack__section-title">Animation</h2>
+        <ol class="stack__list">
+          <li class="stack__item">
+            <span class="stack__rank">12</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">GSAP</span>
+                <span class="stack__badge stack__badge--animation"
+                  >Animation</span
+                >
+              </div>
+              <p class="stack__notes">
+                Used for page-level animation — entrance sequences, staggered
+                reveals, and multi-element timelines. Runs as a standard script
+                in Astro with no React dependency. The timeline API gives
+                precise, sequenced control over motion that CSS transitions
+                can't replicate.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="stack__section" aria-label="DX">
+        <h2 class="stack__section-title">DX</h2>
+        <ol class="stack__list">
+          <li class="stack__item">
+            <span class="stack__rank">13</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">Prettier</span>
+                <span class="stack__badge stack__badge--dx">Tooling</span>
+              </div>
+              <p class="stack__notes">
+                Opinionated code formatter applied across all file types —
+                TypeScript, HTML, CSS, JSON. Formatting is automatic and
+                consistent, with no manual decisions about style. Configured
+                with eslint-config-prettier to disable any ESLint rules that
+                would conflict.
+              </p>
+            </div>
+          </li>
+
+          <li class="stack__item">
+            <span class="stack__rank">14</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">ESLint</span>
+                <span class="stack__badge stack__badge--dx">Tooling</span>
+              </div>
+              <p class="stack__notes">
+                Static analysis across every project, configured with ESLint 9
+                flat config. Extended with typescript-eslint,
+                eslint-plugin-astro, and eslint-plugin-react. Catches type
+                misuse, dead code, and inconsistent patterns at save time in VS
+                Code and enforced again in the pre-deploy pipeline.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="stack__section" aria-label="Testing">
+        <h2 class="stack__section-title">Testing</h2>
+        <ol class="stack__list">
+          <li class="stack__item">
+            <span class="stack__rank">15</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">Vitest</span>
+                <span class="stack__badge stack__badge--testing"
+                  >Unit Testing</span
+                >
+              </div>
+              <p class="stack__notes">
+                Unit and component testing built on Vite. Because Astro already
+                uses Vite internally, Vitest requires minimal configuration and
+                shares the same transform pipeline. TypeScript support is native
+                and the API mirrors Jest, making it familiar to most JavaScript
+                developers. Used for isolated logic, utility functions, and
+                component behavior.
+              </p>
+            </div>
+          </li>
+
+          <li class="stack__item">
+            <span class="stack__rank">16</span>
+            <div class="stack__content">
+              <div class="stack__item-header">
+                <span class="stack__name">Playwright</span>
+                <span class="stack__badge stack__badge--e2e">E2E Testing</span>
+              </div>
+              <p class="stack__notes">
+                End-to-end testing in real browsers. Covers critical user paths
+                — form submissions, navigation, auth flows — against the actual
+                running site. TypeScript-native and integrates directly with
+                Netlify branch preview URLs, enabling E2E tests to run against
+                every PR before it merges.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <p class="stack__copyright">&copy; 2026 aephonics</p>
+    </main>
+  </body>
+</html>
