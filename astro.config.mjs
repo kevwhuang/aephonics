@@ -1,4 +1,3 @@
-import compressor from 'astro-compressor';
 import { defineConfig } from 'astro/config';
 import netlify from '@astrojs/netlify';
 import react from '@astrojs/react';
@@ -18,13 +17,15 @@ export default defineConfig({
         react(),
         robots(),
         sitemap({ lastmod: new Date() }),
-        compressor(),
     ],
     prefetch: {
         defaultStrategy: 'hover',
     },
     site: 'https://aephonics.com',
     vite: {
+        optimizeDeps: {
+            exclude: ['astro/virtual-modules/prefetch.js'],
+        },
         plugins: [tailwind()],
     },
 });

@@ -1,0 +1,525 @@
+---
+
+---
+
+<section
+    class="hero relative flex min-h-screen items-center justify-center overflow-hidden"
+>
+    <canvas class="hero__grid absolute inset-0"></canvas>
+    <canvas class="hero__pulses absolute inset-0"></canvas>
+    <div
+        class="hero__content relative z-10 max-w-7xl select-none px-6 text-center"
+    >
+        <h1
+            class="hero__title mb-8 font-extralight text-[2.75rem] tracking-wide min-[400px]:text-6xl sm:text-8xl md:text-9xl lg:text-[12rem]"
+        >
+        </h1>
+        <p
+            class="hero__tagline mx-auto max-w-2xl font-mono text-base lowercase tracking-[0.2em] opacity-0 sm:text-lg md:text-xl md:tracking-[0.3em]"
+        >
+            <span class="hero__tag hero__tag--atx">atx</span>
+            <span class="text-zinc-700">/</span>
+            <span class="hero__tag hero__tag--syntax">syntax</span>
+            <span class="text-zinc-700">/</span>
+            <span class="hero__tag hero__tag--wavs">wavs</span>
+        </p>
+    </div>
+    <div
+        class="hero__arrow absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce opacity-0 transition-opacity duration-500"
+    >
+        <svg
+            class="h-8 w-8 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+        >
+            <path
+                d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+            >
+            </path>
+        </svg>
+    </div>
+</section>
+
+<style>
+    .hero__cursor {
+        -webkit-background-clip: unset;
+        -webkit-text-fill-color: white;
+        animation: hero__blink 530ms steps(1) infinite;
+        background: none;
+    }
+
+    .hero__grid,
+    .hero__pulses {
+        animation: hero__fade-in 2s ease-out forwards;
+    }
+
+    .hero__tag--atx {
+        color: rgba(249, 115, 22, 0.7);
+        text-shadow: 0 0 15px rgba(249, 115, 22, 0.3);
+    }
+
+    .hero__tag--syntax {
+        color: rgba(6, 182, 212, 0.7);
+        text-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+    }
+
+    .hero__tag--wavs {
+        color: rgba(236, 72, 153, 0.7);
+        text-shadow: 0 0 15px rgba(236, 72, 153, 0.3);
+    }
+
+    .hero__title {
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.75) 0%,
+            rgba(255, 255, 255, 0.75) 40%,
+            rgba(255, 255, 255, 1) 50%,
+            rgba(255, 255, 255, 0.75) 60%,
+            rgba(255, 255, 255, 0.75) 100%
+        );
+        background-clip: text;
+        background-size: 250% 100%;
+        filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.12));
+        font-variant-caps: small-caps;
+    }
+
+    @keyframes hero__blink {
+        50% {
+            opacity: 0;
+        }
+    }
+
+    @keyframes hero__fade-in {
+        0% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 0.6;
+        }
+    }
+
+    @keyframes hero__title {
+        0%,
+        100% {
+            background-position: 150% 50%;
+        }
+
+        50% {
+            background-position: -50% 50%;
+        }
+    }
+</style>
+
+<script>
+    type Direction = 'down' | 'left' | 'right' | 'up';
+
+    interface Point {
+        x: number;
+        y: number;
+    }
+
+    interface Pulse extends Point {
+        dir: Direction;
+        trail: Point[];
+    }
+
+    const ARROW_DELAY = 2000;
+    const CANVAS_OPACITY = '0.6';
+    const CURSOR_DELAY = 500;
+    const GRID_COLOR = 'rgba(6, 182, 212, 0.15)';
+    const GRID_DRAW_INTERVAL = 30;
+    const GRID_LINE_WIDTH = 1;
+    const GRID_SIZE = 100;
+    const INITIAL_BLUR = 8;
+    const INITIAL_DELAY = 2200;
+    const MAX_PULSES = 5;
+    const OFFSCREEN_MARGIN = 50;
+    const PULSE_ANIMATION_DELAY = 800;
+    const PULSE_COLOR = 'rgba(6, 182, 212, 0.35)';
+    const PULSE_GLOW = 'rgba(6, 182, 212, 0.3)';
+    const PULSE_HEAD_RADIUS = 3;
+    const PULSE_SHADOW_BLUR = 4;
+    const PULSE_SPAWN_INTERVAL = 800;
+    const PULSE_SPEED = 3;
+    const SCROLL_THRESHOLD = 50;
+    const TAGLINE_DELAY = 800;
+    const TITLE_ANIMATION_DELAY = 1000;
+    const TITLE_SHIMMER_DURATION = 10;
+    const TRAIL_ALPHA = 0.15;
+    const TRAIL_LENGTH = 12;
+    const TRAIL_RADIUS_MAX = 2;
+    const TRAIL_RADIUS_MIN = 1;
+    const TURN_PROBABILITY = 0.92;
+    const TYPING_INTERVAL = 100;
+
+    let arrowVisible = false;
+
+    function showArrow(): void {
+        arrowVisible = true;
+        const arrow = document.querySelector(
+            '.hero__arrow',
+        ) as HTMLElement | null;
+        if (arrow) arrow.style.opacity = '1';
+    }
+
+    function initScrollArrow(): void {
+        const arrow = document.querySelector('.hero__arrow');
+        if (!arrow) return;
+
+        function handleScroll(): void {
+            if (!arrowVisible) return;
+            (arrow as HTMLElement).style.opacity =
+                window.scrollY > SCROLL_THRESHOLD ? '0' : '1';
+        }
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    function initGrid(): void {
+        const section = document.querySelector('.hero');
+        const gridCanvas = document.querySelector(
+            '.hero__grid',
+        ) as HTMLCanvasElement | null;
+        const pulseCanvas = document.querySelector(
+            '.hero__pulses',
+        ) as HTMLCanvasElement | null;
+        if (!section || !gridCanvas || !pulseCanvas) return;
+
+        const gridCtx = gridCanvas.getContext('2d');
+        const pulseCtx = pulseCanvas.getContext('2d');
+        if (!gridCtx || !pulseCtx) return;
+
+        const pulses: Pulse[] = [];
+        let horizontalLines = 0;
+        let verticalLines = 0;
+        let maxHorizontalLines = 0;
+        let maxVerticalLines = 0;
+        let gridComplete = false;
+        let isInitialResize = true;
+
+        function drawLine(
+            ctx: CanvasRenderingContext2D,
+            x1: number,
+            y1: number,
+            x2: number,
+            y2: number,
+        ): void {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+
+        function drawFullGrid(): void {
+            const ctx = gridCtx!;
+            const w = gridCanvas!.width;
+            const h = gridCanvas!.height;
+
+            ctx.clearRect(0, 0, w, h);
+            ctx.strokeStyle = GRID_COLOR;
+            ctx.lineWidth = GRID_LINE_WIDTH;
+
+            for (let y = 0; y <= h; y += GRID_SIZE) {
+                drawLine(ctx, 0, y, w, y);
+            }
+
+            for (let x = 0; x <= w; x += GRID_SIZE) {
+                drawLine(ctx, x, 0, x, h);
+            }
+        }
+
+        function drawGridLine(): void {
+            if (gridComplete) return;
+
+            const ctx = gridCtx!;
+            const w = gridCanvas!.width;
+            const h = gridCanvas!.height;
+
+            ctx.strokeStyle = GRID_COLOR;
+            ctx.lineWidth = GRID_LINE_WIDTH;
+
+            if (horizontalLines < maxHorizontalLines) {
+                drawLine(
+                    ctx,
+                    0,
+                    horizontalLines * GRID_SIZE,
+                    w,
+                    horizontalLines * GRID_SIZE,
+                );
+                horizontalLines++;
+            } else if (verticalLines < maxVerticalLines) {
+                drawLine(
+                    ctx,
+                    verticalLines * GRID_SIZE,
+                    0,
+                    verticalLines * GRID_SIZE,
+                    h,
+                );
+                verticalLines++;
+            } else {
+                gridComplete = true;
+            }
+        }
+
+        function handleResize(): void {
+            const width = (section as HTMLElement).offsetWidth;
+            const height = (section as HTMLElement).offsetHeight;
+            gridCanvas!.width = width;
+            gridCanvas!.height = height;
+            pulseCanvas!.width = width;
+            pulseCanvas!.height = height;
+            maxHorizontalLines = Math.ceil(height / GRID_SIZE) + 1;
+            maxVerticalLines = Math.ceil(width / GRID_SIZE) + 1;
+
+            if (!isInitialResize) {
+                gridComplete = true;
+                gridCanvas!.style.animation = 'none';
+                gridCanvas!.style.opacity = CANVAS_OPACITY;
+                pulseCanvas!.style.animation = 'none';
+                pulseCanvas!.style.opacity = CANVAS_OPACITY;
+                drawFullGrid();
+            }
+
+            isInitialResize = false;
+        }
+
+        function spawnPulse(): void {
+            if (pulses.length >= MAX_PULSES) return;
+
+            const edge = Math.floor(Math.random() * 4);
+            let x: number;
+            let y: number;
+            let dir: Direction;
+
+            switch (edge) {
+                case 0:
+                    x = 0;
+                    y =
+                        Math.floor(Math.random() * maxHorizontalLines) *
+                        GRID_SIZE;
+                    dir = 'right';
+                    break;
+                case 1:
+                    x =
+                        Math.floor(Math.random() * maxVerticalLines) *
+                        GRID_SIZE;
+                    y = 0;
+                    dir = 'down';
+                    break;
+                case 2:
+                    x = gridCanvas!.width;
+                    y =
+                        Math.floor(Math.random() * maxHorizontalLines) *
+                        GRID_SIZE;
+                    dir = 'left';
+                    break;
+                default:
+                    x =
+                        Math.floor(Math.random() * maxVerticalLines) *
+                        GRID_SIZE;
+                    y = gridCanvas!.height;
+                    dir = 'up';
+                    break;
+            }
+
+            pulses.push({ dir, trail: [], x, y });
+        }
+
+        function movePulse(pulse: Pulse): void {
+            switch (pulse.dir) {
+                case 'down':
+                    pulse.y += PULSE_SPEED;
+                    break;
+                case 'left':
+                    pulse.x -= PULSE_SPEED;
+                    break;
+                case 'right':
+                    pulse.x += PULSE_SPEED;
+                    break;
+                case 'up':
+                    pulse.y -= PULSE_SPEED;
+                    break;
+            }
+        }
+
+        function maybeTurnPulse(pulse: Pulse): void {
+            const isHorizontal = pulse.dir === 'left' || pulse.dir === 'right';
+            const position = isHorizontal ? pulse.x : pulse.y;
+            const shouldTurn =
+                Math.abs(position % GRID_SIZE) < PULSE_SPEED &&
+                Math.random() > TURN_PROBABILITY;
+
+            if (!shouldTurn) return;
+
+            if (isHorizontal) {
+                pulse.dir = Math.random() > 0.5 ? 'down' : 'up';
+            } else {
+                pulse.dir = Math.random() > 0.5 ? 'left' : 'right';
+            }
+        }
+
+        function drawPulseTrail(pulse: Pulse): void {
+            for (let i = 0; i < pulse.trail.length; i++) {
+                const alpha = (1 - i / TRAIL_LENGTH) * TRAIL_ALPHA;
+                const radius =
+                    (1 - i / TRAIL_LENGTH) * TRAIL_RADIUS_MAX +
+                    TRAIL_RADIUS_MIN;
+                pulseCtx!.fillStyle = `rgba(6, 182, 212, ${alpha})`;
+                pulseCtx!.beginPath();
+                pulseCtx!.arc(
+                    pulse.trail[i].x,
+                    pulse.trail[i].y,
+                    radius,
+                    0,
+                    Math.PI * 2,
+                );
+                pulseCtx!.fill();
+            }
+        }
+
+        function drawPulseHead(pulse: Pulse): void {
+            pulseCtx!.fillStyle = PULSE_COLOR;
+            pulseCtx!.shadowColor = PULSE_GLOW;
+            pulseCtx!.shadowBlur = PULSE_SHADOW_BLUR;
+            pulseCtx!.beginPath();
+            pulseCtx!.arc(pulse.x, pulse.y, PULSE_HEAD_RADIUS, 0, Math.PI * 2);
+            pulseCtx!.fill();
+            pulseCtx!.shadowBlur = 0;
+        }
+
+        function isOffscreen(pulse: Pulse): boolean {
+            return (
+                pulse.x < -OFFSCREEN_MARGIN ||
+                pulse.x > pulseCanvas!.width + OFFSCREEN_MARGIN ||
+                pulse.y < -OFFSCREEN_MARGIN ||
+                pulse.y > pulseCanvas!.height + OFFSCREEN_MARGIN
+            );
+        }
+
+        function animatePulses(): void {
+            pulseCtx!.clearRect(0, 0, pulseCanvas!.width, pulseCanvas!.height);
+
+            for (let i = pulses.length - 1; i >= 0; i--) {
+                const pulse = pulses[i];
+
+                pulse.trail.unshift({ x: pulse.x, y: pulse.y });
+                if (pulse.trail.length > TRAIL_LENGTH) pulse.trail.pop();
+
+                movePulse(pulse);
+                maybeTurnPulse(pulse);
+                drawPulseTrail(pulse);
+                drawPulseHead(pulse);
+
+                if (isOffscreen(pulse)) {
+                    pulses.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(animatePulses);
+        }
+
+        function startPulses(): void {
+            animatePulses();
+            setInterval(spawnPulse, PULSE_SPAWN_INTERVAL);
+            spawnPulse();
+        }
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        (window as Window & { startPulses?: () => void }).startPulses =
+            startPulses;
+
+        const interval = setInterval(() => {
+            drawGridLine();
+
+            if (gridComplete) {
+                clearInterval(interval);
+                gridCanvas!.style.animation = 'none';
+                gridCanvas!.style.opacity = CANVAS_OPACITY;
+                pulseCanvas!.style.animation = 'none';
+                pulseCanvas!.style.opacity = CANVAS_OPACITY;
+            }
+        }, GRID_DRAW_INTERVAL);
+    }
+
+    function initTypewriter(): void {
+        const title = document.querySelector(
+            '.hero__title',
+        ) as HTMLElement | null;
+        const tagline = document.querySelector(
+            '.hero__tagline',
+        ) as HTMLElement | null;
+        if (!title || title.dataset.typed) return;
+
+        title.dataset.typed = 'true';
+
+        const text = 'aephonics';
+        let charIndex = 0;
+        let textSpan: HTMLSpanElement | null = null;
+        let cursorSpan: HTMLSpanElement | null = null;
+
+        function showCursor(): void {
+            title!.innerHTML =
+                '<span class="hero__text"></span><span class="hero__cursor">|</span>';
+            textSpan = title!.querySelector('.hero__text');
+            cursorSpan = title!.querySelector('.hero__cursor');
+        }
+
+        function typeNextChar(): void {
+            if (charIndex < text.length) {
+                if (textSpan)
+                    textSpan.textContent = text.slice(0, charIndex + 1);
+                charIndex++;
+                setTimeout(typeNextChar, TYPING_INTERVAL);
+            } else {
+                if (cursorSpan) cursorSpan.remove();
+                title!.style.filter = 'blur(0px)';
+
+                setTimeout(() => {
+                    if (tagline) {
+                        tagline.style.transition = 'opacity 1s ease-out';
+                        tagline.style.opacity = '1';
+                    }
+                }, TAGLINE_DELAY);
+
+                setTimeout(() => {
+                    title!.style.animation = `hero__title ${TITLE_SHIMMER_DURATION}s ease-in-out infinite`;
+                }, TITLE_ANIMATION_DELAY);
+
+                setTimeout(() => {
+                    showArrow();
+                    setTimeout(() => {
+                        (
+                            window as Window & { startPulses?: () => void }
+                        ).startPulses?.();
+                    }, PULSE_ANIMATION_DELAY);
+                }, ARROW_DELAY);
+            }
+        }
+
+        title.innerHTML = '';
+        title.style.filter = `blur(${INITIAL_BLUR}px)`;
+        title.style.transition = 'filter 1.5s ease-out';
+
+        setTimeout(() => {
+            showCursor();
+            setTimeout(typeNextChar, CURSOR_DELAY);
+        }, INITIAL_DELAY);
+    }
+
+    function init(): void {
+        initScrollArrow();
+        initGrid();
+        initTypewriter();
+    }
+
+    init();
+    document.addEventListener('astro:page-load', init);
+</script>
