@@ -1,0 +1,147 @@
+---
+interface Link {
+    color: string;
+    description: string;
+    href: string;
+    title: string;
+}
+
+const links: Link[] = [
+    {
+        color: '#6366f1',
+        description: 'Complexity tamed into elegant solutions',
+        href: 'https://algo.aephonics.com',
+        title: 'Algo',
+    },
+    {
+        color: '#06b6d4',
+        description: 'Building the systems that power tomorrow',
+        href: 'https://dev.aephonics.com',
+        title: 'Dev',
+    },
+    {
+        color: '#ec4899',
+        description: 'Frequencies shaped into feeling',
+        href: 'https://music.aephonics.com',
+        title: 'Music',
+    },
+    {
+        color: '#f97316',
+        description: 'Worlds witnessed, moments preserved',
+        href: 'https://travel.aephonics.com',
+        title: 'Travel',
+    },
+];
+---
+
+<section class="bg-black px-6 py-24">
+    <div class="mx-auto grid max-w-7xl grid-cols-1 md:grid-cols-2 gap-8">
+        {
+            links.map(({ color, description, href, title }) => (
+                <a
+                    aria-label={`Visit ${title} (opens in new tab)`}
+                    class="card group relative min-h-48 p-12 overflow-hidden border border-white/10 bg-white/[0.03] active:scale-[0.99] hover:-translate-y-1"
+                    data-scroll="up"
+                    href={href}
+                    rel="noopener noreferrer"
+                    style={`--accent: ${color}`}
+                    target="_blank"
+                >
+                    <div class="card__glow absolute -inset-0.5 opacity-0 transition-opacity duration-400 group-hover:opacity-100" />
+                    <div class="card__radial absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                    <div class="card__line absolute bottom-0 left-0 h-0.5 w-0 transition-all duration-400 ease-out group-hover:w-full" />
+                    <div class="relative z-10">
+                        <h3 class="card__title mb-3 text-4xl font-bold tracking-tight text-white transition-colors duration-300">
+                            {title}
+                        </h3>
+                        <p class="text-base text-zinc-400 transition-colors duration-300 group-hover:text-zinc-300">
+                            {description}
+                        </p>
+                    </div>
+                    <svg
+                        class="card__icon absolute right-12 top-12 h-6 w-6 text-zinc-600 transition-all duration-400 ease-out group-hover:-translate-y-1 group-hover:translate-x-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            d="M7 17L17 7M17 7H7M17 7V17"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                        />
+                    </svg>
+                </a>
+            ))
+        }
+    </div>
+</section>
+
+<style>
+    .card {
+        transition:
+            background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+            border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+            box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+            transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .card:hover {
+        background-color: rgba(255, 255, 255, 0.06);
+        border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+        box-shadow: 0 20px 40px -20px
+            color-mix(in srgb, var(--accent) 30%, transparent);
+    }
+
+    .card__glow {
+        background: linear-gradient(
+            to bottom right,
+            transparent,
+            color-mix(in srgb, var(--accent) 10%, transparent),
+            transparent
+        );
+    }
+
+    .card:hover .card__glow {
+        animation: card__glow 2s ease-in-out infinite;
+    }
+
+    .card:hover .card__icon {
+        color: var(--accent);
+        filter: drop-shadow(
+            0 0 8px color-mix(in srgb, var(--accent) 50%, transparent)
+        );
+    }
+
+    .card:hover .card__title {
+        color: var(--accent);
+        text-shadow: 0 0 30px color-mix(in srgb, var(--accent) 50%, transparent);
+    }
+
+    .card__radial {
+        background: radial-gradient(
+            circle at 80% 20%,
+            color-mix(in srgb, var(--accent) 15%, transparent) 0%,
+            transparent 50%
+        );
+    }
+
+    .card__line {
+        background: linear-gradient(
+            to right,
+            var(--accent),
+            color-mix(in srgb, var(--accent) 60%, white)
+        );
+    }
+
+    @keyframes card__glow {
+        0%,
+        100% {
+            transform: translateX(-100%);
+        }
+
+        50% {
+            transform: translateX(100%);
+        }
+    }
+</style>
