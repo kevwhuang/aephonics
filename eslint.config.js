@@ -9,15 +9,17 @@ const ignores = {
 };
 
 const style = stylistic.configs.customize({
+    braceStyle: '1tbs',
     indent: 4,
     quotes: 'single',
     semi: true,
 });
 
 const overrides = {
-    files: ['**/*.astro'],
+    files: ['**/*.astro', '**/*.astro/*.ts'],
     rules: {
         '@stylistic/jsx-one-expression-per-line': 'off',
+        '@stylistic/operator-linebreak': 'off',
     },
 };
 
