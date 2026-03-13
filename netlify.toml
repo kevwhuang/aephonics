@@ -8,5 +8,7 @@ port = 8888
 for = '/*'
 [headers.values]
 content-security-policy = 'block-all-mixed-content'
+permissions-policy = 'camera=(), microphone=(), geolocation=()'
+referrer-policy = 'strict-origin-when-cross-origin'
 x-content-type-options = 'nosniff'
 x-frame-options = 'sameorigin'
