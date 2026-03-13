@@ -39,13 +39,11 @@ const links: Link[] = [
         {
             links.map(({ color, description, href, title }) => (
                 <a
-                    aria-label={`Visit ${title} (opens in new tab)`}
+                    aria-label={`Visit ${title}`}
                     class="card group relative min-h-48 p-12 overflow-hidden border border-white/10 bg-white/[0.03] active:scale-[0.99] hover:-translate-y-1"
                     data-scroll="up"
                     href={href}
-                    rel="noopener noreferrer"
                     style={`--accent: ${color}`}
-                    target="_blank"
                 >
                     <div class="card__glow absolute -inset-0.5 opacity-0 transition-opacity duration-400 group-hover:opacity-100" />
                     <div class="card__radial absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
