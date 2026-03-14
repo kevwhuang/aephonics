@@ -5,17 +5,19 @@
 <section
     class="hero relative flex min-h-screen items-center justify-center overflow-hidden"
 >
-    <canvas class="hero__grid absolute inset-0"></canvas>
-    <canvas class="hero__pulses absolute inset-0"></canvas>
+    <canvas aria-hidden="true" class="hero__grid absolute inset-0"></canvas>
+    <canvas aria-hidden="true" class="hero__pulses absolute inset-0"></canvas>
     <div
-        class="hero__content relative z-10 max-w-7xl select-none px-6 text-center"
+        class="hero__content relative z-10 max-w-7xl select-none px-[clamp(1rem,calc(0.5rem+2.5vw),2.5rem)] text-center"
     >
         <h1
-            class="hero__title mb-8 font-extralight text-[2.75rem] tracking-wide min-[400px]:text-6xl sm:text-8xl md:text-9xl lg:text-[12rem]"
+            aria-label="aephonics"
+            class="hero__title mb-[clamp(1rem,calc(0.33rem+3.33vw),3rem)] font-extralight text-[clamp(2.75rem,calc(-1.33rem+20.42vw),15rem)] tracking-wide"
         >
+            aephonics
         </h1>
         <p
-            class="hero__tagline mx-auto max-w-2xl font-mono text-base lowercase tracking-[0.2em] opacity-0 sm:text-lg md:text-xl md:tracking-[0.3em]"
+            class="hero__tagline mx-auto max-w-2xl font-mono lowercase text-[clamp(0.875rem,calc(0.58rem+1.3vw),1.75rem)] tracking-[clamp(0.2em,calc(0.16em+0.2vw),0.3em)] opacity-0"
         >
             <span class="hero__tag hero__tag--atx">atx</span>
             <span class="text-zinc-700">/</span>
@@ -25,9 +27,10 @@
         </p>
     </div>
     <div
-        class="hero__arrow absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce opacity-0 transition-opacity duration-500"
+        class="hero__arrow absolute bottom-12 left-1/2 -translate-x-1/2 p-2 animate-bounce opacity-0 transition-opacity duration-500"
     >
         <svg
+            aria-hidden="true"
             class="h-8 w-8 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
             fill="none"
             stroke="currentColor"
@@ -46,7 +49,6 @@
 
 <style>
     .hero__cursor {
-        -webkit-background-clip: unset;
         -webkit-text-fill-color: white;
         animation: hero__blink 530ms steps(1) infinite;
         background: none;
@@ -58,22 +60,21 @@
     }
 
     .hero__tag--atx {
-        color: rgba(249, 115, 22, 0.7);
-        text-shadow: 0 0 15px rgba(249, 115, 22, 0.3);
+        color: rgba(var(--color-orange), 0.7);
+        text-shadow: 0 0 15px rgba(var(--color-orange), 0.3);
     }
 
     .hero__tag--syntax {
-        color: rgba(6, 182, 212, 0.7);
-        text-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        color: rgba(var(--color-cyan), 0.7);
+        text-shadow: 0 0 15px rgba(var(--color-cyan), 0.3);
     }
 
     .hero__tag--wavs {
-        color: rgba(236, 72, 153, 0.7);
-        text-shadow: 0 0 15px rgba(236, 72, 153, 0.3);
+        color: rgba(var(--color-pink), 0.7);
+        text-shadow: 0 0 15px rgba(var(--color-pink), 0.3);
     }
 
     .hero__title {
-        -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background: linear-gradient(
             90deg,
@@ -130,36 +131,38 @@
         trail: Point[];
     }
 
-    const ARROW_DELAY = 2000;
+    const ARROW_SHOW_DELAY = 2000;
     const CANVAS_OPACITY = '0.6';
-    const CURSOR_DELAY = 500;
-    const GRID_COLOR = 'rgba(6, 182, 212, 0.15)';
+    const CYAN = getComputedStyle(document.documentElement).getPropertyValue('--color-cyan').trim();
+    const GRID_COLOR = `rgba(${CYAN}, 0.15)`;
     const GRID_DRAW_INTERVAL = 30;
     const GRID_LINE_WIDTH = 1;
     const GRID_SIZE = 100;
-    const INITIAL_BLUR = 8;
-    const INITIAL_DELAY = 2200;
     const MAX_PULSES = 5;
     const OFFSCREEN_MARGIN = 50;
-    const PULSE_ANIMATION_DELAY = 800;
-    const PULSE_COLOR = 'rgba(6, 182, 212, 0.35)';
-    const PULSE_GLOW = 'rgba(6, 182, 212, 0.3)';
+    const PULSE_COLOR = `rgba(${CYAN}, 0.35)`;
+    const PULSE_GLOW_COLOR = `rgba(${CYAN}, 0.3)`;
     const PULSE_HEAD_RADIUS = 3;
     const PULSE_SHADOW_BLUR = 4;
     const PULSE_SPAWN_INTERVAL = 800;
+    const PULSE_START_DELAY = 800;
     const PULSE_SPEED = 3;
     const SCROLL_THRESHOLD = 50;
-    const TAGLINE_DELAY = 800;
-    const TITLE_ANIMATION_DELAY = 1000;
+    const SEQUENCE_START_DELAY = 2200;
+    const STRAIGHT_PROBABILITY = 0.92;
+    const TAGLINE_FADE_DELAY = 800;
+    const TITLE_INITIAL_BLUR = 8;
+    const TITLE_SHIMMER_DELAY = 1000;
     const TITLE_SHIMMER_DURATION = 10;
     const TRAIL_ALPHA = 0.15;
     const TRAIL_LENGTH = 12;
     const TRAIL_RADIUS_MAX = 2;
     const TRAIL_RADIUS_MIN = 1;
-    const TURN_PROBABILITY = 0.92;
     const TYPING_INTERVAL = 100;
+    const TYPING_START_DELAY = 500;
 
     let arrowVisible = false;
+    let startPulsesCallback: (() => void) | null = null;
 
     function showArrow(): void {
         arrowVisible = true;
@@ -354,7 +357,7 @@
             const position = isHorizontal ? pulse.x : pulse.y;
             const shouldTurn =
                 Math.abs(position % GRID_SIZE) < PULSE_SPEED &&
-                Math.random() > TURN_PROBABILITY;
+                Math.random() > STRAIGHT_PROBABILITY;
 
             if (!shouldTurn) return;
 
@@ -371,7 +374,7 @@
                 const radius =
                     (1 - i / TRAIL_LENGTH) * TRAIL_RADIUS_MAX +
                     TRAIL_RADIUS_MIN;
-                pulseCtx!.fillStyle = `rgba(6, 182, 212, ${alpha})`;
+                pulseCtx!.fillStyle = `rgba(${CYAN}, ${alpha})`;
                 pulseCtx!.beginPath();
                 pulseCtx!.arc(
                     pulse.trail[i].x,
@@ -386,7 +389,7 @@
 
         function drawPulseHead(pulse: Pulse): void {
             pulseCtx!.fillStyle = PULSE_COLOR;
-            pulseCtx!.shadowColor = PULSE_GLOW;
+            pulseCtx!.shadowColor = PULSE_GLOW_COLOR;
             pulseCtx!.shadowBlur = PULSE_SHADOW_BLUR;
             pulseCtx!.beginPath();
             pulseCtx!.arc(pulse.x, pulse.y, PULSE_HEAD_RADIUS, 0, Math.PI * 2);
@@ -433,8 +436,7 @@
 
         handleResize();
         window.addEventListener('resize', handleResize);
-        (window as Window & { startPulses?: () => void }).startPulses =
-            startPulses;
+        startPulsesCallback = startPulses;
 
         const interval = setInterval(() => {
             drawGridLine();
@@ -487,31 +489,29 @@
                         tagline.style.transition = 'opacity 1s ease-out';
                         tagline.style.opacity = '1';
                     }
-                }, TAGLINE_DELAY);
+                }, TAGLINE_FADE_DELAY);
 
                 setTimeout(() => {
                     title!.style.animation = `hero__title ${TITLE_SHIMMER_DURATION}s ease-in-out infinite`;
-                }, TITLE_ANIMATION_DELAY);
+                }, TITLE_SHIMMER_DELAY);
 
                 setTimeout(() => {
                     showArrow();
                     setTimeout(() => {
-                        (
-                            window as Window & { startPulses?: () => void }
-                        ).startPulses?.();
-                    }, PULSE_ANIMATION_DELAY);
-                }, ARROW_DELAY);
+                        startPulsesCallback?.();
+                    }, PULSE_START_DELAY);
+                }, ARROW_SHOW_DELAY);
             }
         }
 
         title.innerHTML = '';
-        title.style.filter = `blur(${INITIAL_BLUR}px)`;
+        title.style.filter = `blur(${TITLE_INITIAL_BLUR}px)`;
         title.style.transition = 'filter 1.5s ease-out';
 
         setTimeout(() => {
             showCursor();
-            setTimeout(typeNextChar, CURSOR_DELAY);
-        }, INITIAL_DELAY);
+            setTimeout(typeNextChar, TYPING_START_DELAY);
+        }, SEQUENCE_START_DELAY);
     }
 
     function init(): void {

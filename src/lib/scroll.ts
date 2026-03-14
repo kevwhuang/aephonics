@@ -5,7 +5,7 @@ type Direction = 'down' | 'left' | 'right' | 'up';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function scroll(): void {
+export function initScrollAnimations(): void {
     const elements = document.querySelectorAll<HTMLElement>('[data-scroll]');
 
     elements.forEach((element) => {
