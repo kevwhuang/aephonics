@@ -1,22 +1,22 @@
 ---
-
+import ArrowDownIcon from '@components/ArrowDownIcon.astro';
 ---
 
 <section
-    class="hero relative flex min-h-screen items-center justify-center overflow-hidden"
+    class="hero relative flex items-center justify-center min-h-screen overflow-hidden"
 >
-    <canvas aria-hidden="true" class="hero__grid absolute inset-0"></canvas>
-    <canvas aria-hidden="true" class="hero__pulses absolute inset-0"></canvas>
+    <canvas class="hero__grid absolute inset-0" aria-hidden="true"></canvas>
+    <canvas class="hero__pulses absolute inset-0" aria-hidden="true"></canvas>
     <div
-        class="hero__content relative z-10 max-w-7xl select-none px-[clamp(1rem,calc(0.5rem+2.5vw),2.5rem)] text-center"
+        class="hero__content relative z-10 max-w-7xl px-[clamp(1rem,calc(0.5rem+2.5vw),2.5rem)] text-center select-none"
     >
         <h1
-            aria-label="aephonics"
             class="hero__title mb-[clamp(1rem,calc(0.33rem+3.33vw),3rem)] font-extralight text-[clamp(2.75rem,calc(-1.33rem+20.42vw),15rem)] tracking-wide"
+            aria-label="aephonics"
         >
         </h1>
         <p
-            class="hero__tagline mx-auto max-w-2xl font-mono lowercase text-[clamp(0.875rem,calc(0.58rem+1.3vw),1.75rem)] tracking-[clamp(0.2em,calc(0.16em+0.2vw),0.3em)] opacity-0"
+            class="hero__tagline max-w-2xl mx-auto font-mono lowercase text-[clamp(0.875rem,calc(0.58rem+1.3vw),1.75rem)] tracking-[clamp(0.2em,calc(0.16em+0.2vw),0.3em)] opacity-0"
         >
             <span class="hero__tag hero__tag--atx">atx</span>
             <span class="text-zinc-700">/</span>
@@ -26,31 +26,17 @@
         </p>
     </div>
     <div
-        class="hero__arrow absolute bottom-12 left-1/2 -translate-x-1/2 p-2 animate-bounce opacity-0 transition-opacity duration-500"
+        class="hero__arrow absolute bottom-12 left-1/2 p-2 opacity-0 -translate-x-1/2 animate-bounce transition-opacity duration-500"
     >
-        <svg
-            aria-hidden="true"
-            class="h-8 w-8 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-            >
-            </path>
-        </svg>
+        <ArrowDownIcon />
     </div>
 </section>
 
 <style>
     .hero__cursor {
-        -webkit-text-fill-color: white;
-        animation: hero__blink 530ms steps(1) infinite;
+        animation: hero__blink 500ms steps(1) infinite;
         background: none;
+        -webkit-text-fill-color: white;
     }
 
     .hero__grid,
@@ -74,19 +60,20 @@
     }
 
     .hero__title {
-        -webkit-text-fill-color: transparent;
         background: linear-gradient(
             90deg,
-            rgba(255, 255, 255, 0.75) 0%,
-            rgba(255, 255, 255, 0.75) 40%,
-            rgba(255, 255, 255, 1) 50%,
-            rgba(255, 255, 255, 0.75) 60%,
-            rgba(255, 255, 255, 0.75) 100%
+            rgba(var(--rgb-white), 0.75) 0%,
+            rgba(var(--rgb-white), 0.75) 40%,
+            rgba(var(--rgb-white), 1) 50%,
+            rgba(var(--rgb-white), 0.75) 60%,
+            rgba(var(--rgb-white), 0.75) 100%
         );
         background-clip: text;
         background-size: 250% 100%;
-        filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.12));
+        filter: drop-shadow(0 0 40px rgba(var(--rgb-white), 0.12));
         font-variant-caps: small-caps;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     @keyframes hero__blink {
@@ -132,20 +119,17 @@
 
     const ARROW_SHOW_DELAY = 2000;
     const CANVAS_OPACITY = '0.6';
-    const CYAN = getComputedStyle(document.documentElement).getPropertyValue('--color-cyan').trim();
-    const GRID_COLOR = `rgba(${CYAN}, 0.15)`;
+    const EDGE_COUNT = 4;
     const GRID_DRAW_INTERVAL = 30;
     const GRID_LINE_WIDTH = 1;
     const GRID_SIZE = 100;
     const MAX_PULSES = 5;
     const OFFSCREEN_MARGIN = 50;
-    const PULSE_COLOR = `rgba(${CYAN}, 0.35)`;
-    const PULSE_GLOW_COLOR = `rgba(${CYAN}, 0.3)`;
     const PULSE_HEAD_RADIUS = 3;
     const PULSE_SHADOW_BLUR = 4;
     const PULSE_SPAWN_INTERVAL = 800;
-    const PULSE_START_DELAY = 800;
     const PULSE_SPEED = 3;
+    const PULSE_START_DELAY = 800;
     const SCROLL_THRESHOLD = 50;
     const SEQUENCE_START_DELAY = 2200;
     const STRAIGHT_PROBABILITY = 0.92;
@@ -157,31 +141,43 @@
     const TRAIL_LENGTH = 12;
     const TRAIL_RADIUS_MAX = 2;
     const TRAIL_RADIUS_MIN = 1;
+    const TWO_PI = Math.PI * 2;
     const TYPING_INTERVAL = 100;
     const TYPING_START_DELAY = 500;
 
+    let CYAN = '';
+    let GRID_COLOR = '';
+    let PULSE_COLOR = '';
+    let PULSE_GLOW_COLOR = '';
     let arrowVisible = false;
+    let gridIntervalId = 0;
+    let rafId = 0;
+    let resizeHandler: (() => void) | null = null;
+    let scrollHandler: (() => void) | null = null;
+    let spawnIntervalId = 0;
     let startPulsesCallback: (() => void) | null = null;
 
-    function showArrow(): void {
-        arrowVisible = true;
-        const arrow = document.querySelector(
-            '.hero__arrow',
-        ) as HTMLElement | null;
-        if (arrow) arrow.style.opacity = '1';
-    }
+    function cleanup(): void {
+        cancelAnimationFrame(rafId);
+        clearInterval(gridIntervalId);
+        clearInterval(spawnIntervalId);
 
-    function initScrollArrow(): void {
-        const arrow = document.querySelector('.hero__arrow');
-        if (!arrow) return;
-
-        function handleScroll(): void {
-            if (!arrowVisible) return;
-            (arrow as HTMLElement).style.opacity =
-                window.scrollY > SCROLL_THRESHOLD ? '0' : '1';
+        if (resizeHandler) {
+            window.removeEventListener('resize', resizeHandler);
+            resizeHandler = null;
         }
 
-        window.addEventListener('scroll', handleScroll, { passive: true });
+        if (scrollHandler) {
+            window.removeEventListener('scroll', scrollHandler);
+            scrollHandler = null;
+        }
+    }
+
+    function initColors(): void {
+        CYAN = getComputedStyle(document.documentElement).getPropertyValue('--color-cyan').trim();
+        GRID_COLOR = `rgba(${CYAN}, 0.15)`;
+        PULSE_COLOR = `rgba(${CYAN}, 0.35)`;
+        PULSE_GLOW_COLOR = `rgba(${CYAN}, 0.3)`;
     }
 
     function initGrid(): void {
@@ -199,24 +195,29 @@
         if (!gridCtx || !pulseCtx) return;
 
         const pulses: Pulse[] = [];
+        let gridComplete = false;
         let horizontalLines = 0;
-        let verticalLines = 0;
+        let isInitialResize = true;
         let maxHorizontalLines = 0;
         let maxVerticalLines = 0;
-        let gridComplete = false;
-        let isInitialResize = true;
+        let verticalLines = 0;
 
-        function drawLine(
-            ctx: CanvasRenderingContext2D,
-            x1: number,
-            y1: number,
-            x2: number,
-            y2: number,
-        ): void {
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.stroke();
+        function animatePulses(): void {
+            pulseCtx!.clearRect(0, 0, pulseCanvas!.width, pulseCanvas!.height);
+
+            for (let i = pulses.length - 1; i >= 0; i--) {
+                const pulse = pulses[i];
+
+                pulse.trail.unshift({ x: pulse.x, y: pulse.y });
+                if (pulse.trail.length > TRAIL_LENGTH) pulse.trail.pop();
+                movePulse(pulse);
+                maybeTurnPulse(pulse);
+                drawPulseTrail(pulse);
+                drawPulseHead(pulse);
+                if (isOffscreen(pulse)) pulses.splice(i, 1);
+            }
+
+            rafId = requestAnimationFrame(animatePulses);
         }
 
         function drawFullGrid(): void {
@@ -270,6 +271,48 @@
             }
         }
 
+        function drawLine(
+            ctx: CanvasRenderingContext2D,
+            x1: number,
+            y1: number,
+            x2: number,
+            y2: number,
+        ): void {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+
+        function drawPulseHead(pulse: Pulse): void {
+            pulseCtx!.fillStyle = PULSE_COLOR;
+            pulseCtx!.shadowColor = PULSE_GLOW_COLOR;
+            pulseCtx!.shadowBlur = PULSE_SHADOW_BLUR;
+            pulseCtx!.beginPath();
+            pulseCtx!.arc(pulse.x, pulse.y, PULSE_HEAD_RADIUS, 0, TWO_PI);
+            pulseCtx!.fill();
+            pulseCtx!.shadowBlur = 0;
+        }
+
+        function drawPulseTrail(pulse: Pulse): void {
+            for (let i = 0; i < pulse.trail.length; i++) {
+                const alpha = (1 - i / TRAIL_LENGTH) * TRAIL_ALPHA;
+                const radius =
+                    (1 - i / TRAIL_LENGTH) * TRAIL_RADIUS_MAX +
+                    TRAIL_RADIUS_MIN;
+                pulseCtx!.fillStyle = `rgba(${CYAN}, ${alpha})`;
+                pulseCtx!.beginPath();
+                pulseCtx!.arc(
+                    pulse.trail[i].x,
+                    pulse.trail[i].y,
+                    radius,
+                    0,
+                    TWO_PI,
+                );
+                pulseCtx!.fill();
+            }
+        }
+
         function handleResize(): void {
             const width = (section as HTMLElement).offsetWidth;
             const height = (section as HTMLElement).offsetHeight;
@@ -292,46 +335,29 @@
             isInitialResize = false;
         }
 
-        function spawnPulse(): void {
-            if (pulses.length >= MAX_PULSES) return;
+        function isOffscreen(pulse: Pulse): boolean {
+            return (
+                pulse.x < -OFFSCREEN_MARGIN ||
+                pulse.x > pulseCanvas!.width + OFFSCREEN_MARGIN ||
+                pulse.y < -OFFSCREEN_MARGIN ||
+                pulse.y > pulseCanvas!.height + OFFSCREEN_MARGIN
+            );
+        }
 
-            const edge = Math.floor(Math.random() * 4);
-            let x: number;
-            let y: number;
-            let dir: Direction;
+        function maybeTurnPulse(pulse: Pulse): void {
+            const isHorizontal = pulse.dir === 'left' || pulse.dir === 'right';
+            const position = isHorizontal ? pulse.x : pulse.y;
+            const shouldTurn =
+                Math.abs(position % GRID_SIZE) < PULSE_SPEED &&
+                Math.random() > STRAIGHT_PROBABILITY;
 
-            switch (edge) {
-                case 0:
-                    x = 0;
-                    y =
-                        Math.floor(Math.random() * maxHorizontalLines) *
-                        GRID_SIZE;
-                    dir = 'right';
-                    break;
-                case 1:
-                    x =
-                        Math.floor(Math.random() * maxVerticalLines) *
-                        GRID_SIZE;
-                    y = 0;
-                    dir = 'down';
-                    break;
-                case 2:
-                    x = gridCanvas!.width;
-                    y =
-                        Math.floor(Math.random() * maxHorizontalLines) *
-                        GRID_SIZE;
-                    dir = 'left';
-                    break;
-                default:
-                    x =
-                        Math.floor(Math.random() * maxVerticalLines) *
-                        GRID_SIZE;
-                    y = gridCanvas!.height;
-                    dir = 'up';
-                    break;
+            if (!shouldTurn) return;
+
+            if (isHorizontal) {
+                pulse.dir = Math.random() > 0.5 ? 'down' : 'up';
+            } else {
+                pulse.dir = Math.random() > 0.5 ? 'left' : 'right';
             }
-
-            pulses.push({ dir, trail: [], x, y });
         }
 
         function movePulse(pulse: Pulse): void {
@@ -351,103 +377,84 @@
             }
         }
 
-        function maybeTurnPulse(pulse: Pulse): void {
-            const isHorizontal = pulse.dir === 'left' || pulse.dir === 'right';
-            const position = isHorizontal ? pulse.x : pulse.y;
-            const shouldTurn =
-                Math.abs(position % GRID_SIZE) < PULSE_SPEED &&
-                Math.random() > STRAIGHT_PROBABILITY;
-
-            if (!shouldTurn) return;
-
-            if (isHorizontal) {
-                pulse.dir = Math.random() > 0.5 ? 'down' : 'up';
-            } else {
-                pulse.dir = Math.random() > 0.5 ? 'left' : 'right';
-            }
+        function randomGridX(): number {
+            return Math.floor(Math.random() * maxVerticalLines) * GRID_SIZE;
         }
 
-        function drawPulseTrail(pulse: Pulse): void {
-            for (let i = 0; i < pulse.trail.length; i++) {
-                const alpha = (1 - i / TRAIL_LENGTH) * TRAIL_ALPHA;
-                const radius =
-                    (1 - i / TRAIL_LENGTH) * TRAIL_RADIUS_MAX +
-                    TRAIL_RADIUS_MIN;
-                pulseCtx!.fillStyle = `rgba(${CYAN}, ${alpha})`;
-                pulseCtx!.beginPath();
-                pulseCtx!.arc(
-                    pulse.trail[i].x,
-                    pulse.trail[i].y,
-                    radius,
-                    0,
-                    Math.PI * 2,
-                );
-                pulseCtx!.fill();
-            }
+        function randomGridY(): number {
+            return Math.floor(Math.random() * maxHorizontalLines) * GRID_SIZE;
         }
 
-        function drawPulseHead(pulse: Pulse): void {
-            pulseCtx!.fillStyle = PULSE_COLOR;
-            pulseCtx!.shadowColor = PULSE_GLOW_COLOR;
-            pulseCtx!.shadowBlur = PULSE_SHADOW_BLUR;
-            pulseCtx!.beginPath();
-            pulseCtx!.arc(pulse.x, pulse.y, PULSE_HEAD_RADIUS, 0, Math.PI * 2);
-            pulseCtx!.fill();
-            pulseCtx!.shadowBlur = 0;
-        }
+        function spawnPulse(): void {
+            if (pulses.length >= MAX_PULSES) return;
 
-        function isOffscreen(pulse: Pulse): boolean {
-            return (
-                pulse.x < -OFFSCREEN_MARGIN ||
-                pulse.x > pulseCanvas!.width + OFFSCREEN_MARGIN ||
-                pulse.y < -OFFSCREEN_MARGIN ||
-                pulse.y > pulseCanvas!.height + OFFSCREEN_MARGIN
-            );
-        }
+            const edge = Math.floor(Math.random() * EDGE_COUNT);
+            let dir: Direction;
+            let x: number;
+            let y: number;
 
-        function animatePulses(): void {
-            pulseCtx!.clearRect(0, 0, pulseCanvas!.width, pulseCanvas!.height);
-
-            for (let i = pulses.length - 1; i >= 0; i--) {
-                const pulse = pulses[i];
-
-                pulse.trail.unshift({ x: pulse.x, y: pulse.y });
-                if (pulse.trail.length > TRAIL_LENGTH) pulse.trail.pop();
-
-                movePulse(pulse);
-                maybeTurnPulse(pulse);
-                drawPulseTrail(pulse);
-                drawPulseHead(pulse);
-
-                if (isOffscreen(pulse)) {
-                    pulses.splice(i, 1);
-                }
+            switch (edge) {
+                case 0:
+                    x = 0;
+                    y = randomGridY();
+                    dir = 'right';
+                    break;
+                case 1:
+                    x = randomGridX();
+                    y = 0;
+                    dir = 'down';
+                    break;
+                case 2:
+                    x = gridCanvas!.width;
+                    y = randomGridY();
+                    dir = 'left';
+                    break;
+                default:
+                    x = randomGridX();
+                    y = gridCanvas!.height;
+                    dir = 'up';
+                    break;
             }
 
-            requestAnimationFrame(animatePulses);
+            pulses.push({ dir, trail: [], x, y });
         }
 
         function startPulses(): void {
             animatePulses();
-            setInterval(spawnPulse, PULSE_SPAWN_INTERVAL);
+            spawnIntervalId = window.setInterval(spawnPulse, PULSE_SPAWN_INTERVAL);
             spawnPulse();
         }
 
         handleResize();
+        resizeHandler = handleResize;
         window.addEventListener('resize', handleResize);
         startPulsesCallback = startPulses;
 
-        const interval = setInterval(() => {
+        gridIntervalId = window.setInterval(() => {
             drawGridLine();
 
             if (gridComplete) {
-                clearInterval(interval);
+                clearInterval(gridIntervalId);
                 gridCanvas!.style.animation = 'none';
                 gridCanvas!.style.opacity = CANVAS_OPACITY;
                 pulseCanvas!.style.animation = 'none';
                 pulseCanvas!.style.opacity = CANVAS_OPACITY;
             }
         }, GRID_DRAW_INTERVAL);
+    }
+
+    function initScrollArrow(): void {
+        const arrow = document.querySelector('.hero__arrow');
+        if (!arrow) return;
+
+        function handleScroll(): void {
+            if (!arrowVisible) return;
+            (arrow as HTMLElement).style.opacity =
+                window.scrollY > SCROLL_THRESHOLD ? '0' : '1';
+        }
+
+        scrollHandler = handleScroll;
+        window.addEventListener('scroll', handleScroll, { passive: true });
     }
 
     function initTypewriter(): void {
@@ -463,20 +470,22 @@
 
         const text = 'aephonics';
         let charIndex = 0;
-        let textSpan: HTMLSpanElement | null = null;
         let cursorSpan: HTMLSpanElement | null = null;
+        let textSpan: HTMLSpanElement | null = null;
 
         function showCursor(): void {
-            title!.innerHTML =
-                '<span class="hero__text"></span><span class="hero__cursor">|</span>';
-            textSpan = title!.querySelector('.hero__text');
-            cursorSpan = title!.querySelector('.hero__cursor');
+            title!.textContent = '';
+            textSpan = document.createElement('span');
+            textSpan.className = 'hero__text';
+            cursorSpan = document.createElement('span');
+            cursorSpan.className = 'hero__cursor';
+            cursorSpan.textContent = '|';
+            title!.append(textSpan, cursorSpan);
         }
 
         function typeNextChar(): void {
             if (charIndex < text.length) {
-                if (textSpan)
-                    textSpan.textContent = text.slice(0, charIndex + 1);
+                if (textSpan) textSpan.textContent = text.slice(0, charIndex + 1);
                 charIndex++;
                 setTimeout(typeNextChar, TYPING_INTERVAL);
             } else {
@@ -503,7 +512,7 @@
             }
         }
 
-        title.innerHTML = '';
+        title.textContent = '';
         title.style.filter = `blur(${TITLE_INITIAL_BLUR}px)`;
         title.style.transition = 'filter 1.5s ease-out';
 
@@ -513,12 +522,24 @@
         }, SEQUENCE_START_DELAY);
     }
 
+    function showArrow(): void {
+        arrowVisible = true;
+        const arrow = document.querySelector(
+            '.hero__arrow',
+        ) as HTMLElement | null;
+
+        if (arrow) arrow.style.opacity = '1';
+    }
+
     function init(): void {
+        cleanup();
+        arrowVisible = false;
+        startPulsesCallback = null;
+        initColors();
         initScrollArrow();
         initGrid();
         initTypewriter();
     }
 
-    init();
     document.addEventListener('astro:page-load', init);
 </script>

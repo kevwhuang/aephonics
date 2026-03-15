@@ -1,7 +1,9 @@
-import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import gsap from 'gsap';
 
 type Direction = 'down' | 'left' | 'right' | 'up';
+
+const SCROLL_OFFSET = 60;
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,20 +30,20 @@ export function initScrollAnimations(): void {
 
         switch (direction) {
             case 'down':
-                from.y = -60;
+                from.y = -SCROLL_OFFSET;
                 to.y = 0;
                 break;
             case 'left':
-                from.x = 60;
+                from.x = SCROLL_OFFSET;
                 to.x = 0;
                 break;
             case 'right':
-                from.x = -60;
+                from.x = -SCROLL_OFFSET;
                 to.x = 0;
                 break;
             case 'up':
             default:
-                from.y = 60;
+                from.y = SCROLL_OFFSET;
                 to.y = 0;
                 break;
         }
