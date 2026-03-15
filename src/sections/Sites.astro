@@ -34,7 +34,7 @@ const sites: Site[] = [
 ];
 ---
 
-<section class="px-[clamp(1rem,calc(0.5rem+2.5vw),2.5rem)] py-[clamp(3rem,calc(1.33rem+8.33vw),8rem)] bg-black">
+<section class="px-[clamp(1rem,calc(0.5rem+2.5vw),2.5rem)] py-[clamp(3rem,calc(1.33rem+8.33vw),8rem)] bg-zinc-950">
     <div class="mx-auto grid max-w-7xl grid-cols-1 gap-[clamp(1.5rem,calc(0.83rem+3.33vw),3rem)] md:grid-cols-2">
         {
             sites.map(({ color, description, href, title }) => (
@@ -45,9 +45,9 @@ const sites: Site[] = [
                     href={href}
                     style={`--accent: ${color}`}
                 >
-                    <div class="card__glow absolute -inset-0.5 opacity-0 transition-opacity duration-400 group-hover:opacity-100" />
+                    <div class="card__glow absolute -inset-0.5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     <div class="card__radial absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                    <div class="card__line absolute bottom-0 left-0 h-0.5 w-0 transition-all duration-400 ease-out group-hover:w-full" />
+                    <div class="card__line absolute bottom-0 left-0 h-0.5 w-0 transition-all duration-300 ease-out group-hover:w-full" />
                     <div class="relative z-10">
                         <h2 class="card__title mb-[clamp(0.5rem,calc(0.33rem+0.83vw),1rem)] font-bold text-4xl tracking-tight text-white transition-colors duration-300">
                             {title}
@@ -58,7 +58,7 @@ const sites: Site[] = [
                     </div>
                     <svg
                         aria-hidden="true"
-                        class="card__icon absolute right-[clamp(1.5rem,calc(0.67rem+4.17vw),4rem)] top-[clamp(1.5rem,calc(0.67rem+4.17vw),4rem)] h-6 w-6 text-zinc-600 transition-all duration-400 ease-out group-hover:-translate-y-1 group-hover:translate-x-1"
+                        class="card__icon absolute right-[clamp(1.5rem,calc(0.67rem+4.17vw),4rem)] top-[clamp(1.5rem,calc(0.67rem+4.17vw),4rem)] h-6 w-6 text-zinc-600 transition-all duration-300 ease-out group-hover:-translate-y-1 group-hover:translate-x-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
