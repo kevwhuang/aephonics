@@ -35,21 +35,21 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
         <meta content={description} name="twitter:description" />
         <meta content={`${Astro.site}og.png`} name="twitter:image" />
         <script
-            type="application/ld+json"
             set:html={JSON.stringify({
                 '@context': 'https://schema.org',
                 '@type': 'WebSite',
-                'name': 'Aephonics',
-                'url': 'https://aephonics.com',
                 'founder': {
                     '@type': 'Person',
                     'name': 'Kevin Huang',
                 },
+                'name': 'Aephonics',
+                'url': Astro.site,
             })}
+            type="application/ld+json"
         />
         <ClientRouter />
     </head>
-    <body class="flex min-h-screen flex-col bg-zinc-950 font-sans text-white">
+    <body class="flex flex-col min-h-screen font-sans bg-zinc-950 text-white">
         <main class="flex-1">
             <slot />
         </main>
@@ -66,6 +66,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
         --color-orange: 249, 115, 22;
         --color-pink: 236, 72, 153;
         --font-sans: 'Geist', system-ui, sans-serif;
+        --rgb-white: 255, 255, 255;
     }
 
     :focus {
@@ -73,12 +74,6 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
     }
 
     :focus-visible {
-        outline: 2px solid rgba(var(--color-cyan), 0.8);
-        outline-offset: 2px;
-    }
-
-    a:focus-visible,
-    button:focus-visible {
         border-radius: 2px;
         outline: 2px solid rgba(var(--color-cyan), 0.8);
         outline-offset: 2px;
@@ -103,6 +98,5 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 <script>
     import { initScrollAnimations } from '@lib/scroll';
 
-    initScrollAnimations();
     document.addEventListener('astro:page-load', initScrollAnimations);
 </script>
