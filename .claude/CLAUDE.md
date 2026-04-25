@@ -1,6 +1,6 @@
 # Aephonics
 
-Landing page and hub for aephonics.com. Connects four subdomains: algo, dev, music, and travel. Built with Astro 6, TypeScript, Tailwind CSS 4, and GSAP. Deployed on Netlify.
+Hub for aephonics.com. Links to four subdomains: algo, dev, music, and travel. Built with Astro, TypeScript, Tailwind CSS, and GSAP. Deployed on Netlify.
 
 ## Commands
 
