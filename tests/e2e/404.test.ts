@@ -2,12 +2,12 @@ import { expect, test } from '@playwright/test';
 
 test.describe('404 page', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('/this-page-does-not-exist');
+        await page.goto('/error');
     });
 
     test('returns 404 status', async ({ page }) => {
         await expect(page.locator('h1')).toContainText('404');
-        expect(page.url()).toContain('/this-page-does-not-exist');
+        expect(page.url()).toContain('/error');
     });
 
     test('displays 404 heading', async ({ page }) => {

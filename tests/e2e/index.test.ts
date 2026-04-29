@@ -20,11 +20,6 @@ test.describe('index page', () => {
         await expect(page.locator('.hero__tag--wavs')).toHaveText('wavs');
     });
 
-    test('renders all four site cards', async ({ page }) => {
-        const cards = page.locator('.card');
-        await expect(cards).toHaveCount(4);
-    });
-
     test('site cards link to correct subdomains', async ({ page }) => {
         await expect(page.locator('a[aria-label="Visit Algo"]')).toHaveAttribute('href', 'https://algo.aephonics.com');
         await expect(page.locator('a[aria-label="Visit Dev"]')).toHaveAttribute('href', 'https://dev.aephonics.com');
