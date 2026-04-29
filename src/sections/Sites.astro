@@ -11,25 +11,25 @@ interface Site {
 const sites: Site[] = [
     {
         color: 'rgb(var(--color-indigo))',
-        description: 'Complexity tamed into elegant solutions',
+        description: 'Algorithms and data structures',
         href: 'https://algo.aephonics.com',
         title: 'Algo',
     },
     {
         color: 'rgb(var(--color-cyan))',
-        description: 'Building the systems that power tomorrow',
+        description: 'Web engineering portfolio',
         href: 'https://dev.aephonics.com',
         title: 'Dev',
     },
     {
         color: 'rgb(var(--color-pink))',
-        description: 'Frequencies shaped into feeling',
+        description: 'Producer catalog',
         href: 'https://music.aephonics.com',
         title: 'Music',
     },
     {
         color: 'rgb(var(--color-orange))',
-        description: 'Worlds witnessed, moments preserved',
+        description: 'Interactive travel map',
         href: 'https://travel.aephonics.com',
         title: 'Travel',
     },
@@ -37,24 +37,24 @@ const sites: Site[] = [
 ---
 
 <section class="px-[clamp(1rem,calc(0.5rem+2.5vw),2.5rem)] py-[clamp(3rem,calc(1.33rem+8.33vw),8rem)] bg-zinc-950">
-    <div class="grid grid-cols-1 max-w-7xl mx-auto gap-[clamp(1.5rem,calc(0.83rem+3.33vw),3rem)] md:grid-cols-2">
+    <div class="grid grid-cols-1 max-w-7xl mx-auto gap-[clamp(1.5rem,calc(1rem+2.5vw),3rem)] md:grid-cols-2">
         {
             sites.map(({ color, description, href, title }) => (
                 <a
-                    class="card group relative min-h-32 p-[clamp(1.5rem,calc(0.67rem+4.17vw),4rem)] border border-white/10 bg-white/[0.03] overflow-hidden hover:-translate-y-1 active:scale-[0.99]"
+                    class="card group relative min-h-[clamp(6rem,calc(5.33rem+3.33vw),8rem)] p-[clamp(1.5rem,calc(0.67rem+4.17vw),4rem)] border border-white/10 bg-white/[0.03] overflow-hidden active:scale-[0.99] focus-visible:-translate-y-1 hover:-translate-y-1"
                     aria-label={`Visit ${title}`}
                     data-scroll="up"
                     href={href}
                     style={`--accent: ${color}`}
                 >
-                    <div class="card__glow absolute -inset-0.5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                    <div class="card__radial absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                    <div class="card__line absolute bottom-0 left-0 h-0.5 w-0 transition-all duration-300 ease-out group-hover:w-full" />
+                    <div class="card__glow absolute -inset-0.5 opacity-0 transition-opacity duration-300 group-focus-visible:opacity-100 group-hover:opacity-100" />
+                    <div class="card__radial absolute inset-0 opacity-0 transition-opacity duration-300 group-focus-visible:opacity-100 group-hover:opacity-100" />
+                    <div class="card__line absolute bottom-0 left-0 h-0.5 w-0 transition-all duration-300 ease-in-out group-focus-visible:w-full group-hover:w-full" />
                     <div class="relative z-10">
-                        <h2 class="card__title mb-[clamp(0.5rem,calc(0.33rem+0.83vw),1rem)] font-bold text-4xl tracking-tight text-white transition-colors duration-300">
+                        <h2 class="card__title mb-[clamp(0.5rem,calc(0.33rem+0.83vw),1rem)] font-bold text-[clamp(1.5rem,calc(1.25rem+1.25vw),2.25rem)] tracking-tight text-white transition-colors duration-300">
                             {title}
                         </h2>
-                        <p class="text-base text-zinc-400 transition-colors duration-300 group-hover:text-zinc-300">
+                        <p class="text-[clamp(0.875rem,calc(0.83rem+0.21vw),1rem)] text-zinc-400 transition-colors duration-300 group-focus-visible:text-zinc-300 group-hover:text-zinc-300">
                             {description}
                         </p>
                     </div>
@@ -99,6 +99,7 @@ const sites: Site[] = [
         );
     }
 
+    .card:focus-visible,
     .card:hover {
         background-color: rgba(var(--rgb-white), 0.06);
         border-color: color-mix(in srgb, var(--accent) 50%, transparent);
@@ -106,10 +107,12 @@ const sites: Site[] = [
             color-mix(in srgb, var(--accent) 30%, transparent);
     }
 
+    .card:focus-visible .card__glow,
     .card:hover .card__glow {
         animation: card__glow 2s ease-in-out infinite;
     }
 
+    .card:focus-visible .card__icon,
     .card:hover .card__icon {
         color: var(--accent);
         filter: drop-shadow(
@@ -117,6 +120,7 @@ const sites: Site[] = [
         );
     }
 
+    .card:focus-visible .card__title,
     .card:hover .card__title {
         color: var(--accent);
         text-shadow: 0 0 30px color-mix(in srgb, var(--accent) 50%, transparent);

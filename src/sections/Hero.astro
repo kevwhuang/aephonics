@@ -16,17 +16,17 @@ import ArrowDownIcon from '@components/ArrowDownIcon.astro';
         >
         </h1>
         <p
-            class="hero__tagline max-w-2xl mx-auto font-mono lowercase text-[clamp(0.875rem,calc(0.58rem+1.3vw),1.75rem)] tracking-[clamp(0.2em,calc(0.16em+0.2vw),0.3em)] opacity-0"
+            class="hero__tagline max-w-2xl mx-auto font-mono lowercase text-[clamp(0.875rem,calc(0.58rem+1.46vw),1.75rem)] tracking-[clamp(0.25rem,calc(0.17rem+0.42vw),0.5rem)] opacity-0"
         >
             <span class="hero__tag hero__tag--atx">atx</span>
-            <span class="text-zinc-700">/</span>
+            <span class="text-zinc-600">/</span>
             <span class="hero__tag hero__tag--syntax">syntax</span>
-            <span class="text-zinc-700">/</span>
+            <span class="text-zinc-600">/</span>
             <span class="hero__tag hero__tag--wavs">wavs</span>
         </p>
     </div>
     <div
-        class="hero__arrow absolute bottom-12 left-1/2 p-2 opacity-0 -translate-x-1/2 animate-bounce transition-opacity duration-500"
+        class="hero__arrow absolute bottom-[clamp(2rem,calc(1.67rem+1.67vw),3rem)] left-1/2 p-2 opacity-0 -translate-x-1/2 animate-bounce transition-opacity duration-500"
     >
         <ArrowDownIcon />
     </div>
@@ -36,7 +36,7 @@ import ArrowDownIcon from '@components/ArrowDownIcon.astro';
     .hero__cursor {
         animation: hero__blink 500ms steps(1) infinite;
         background: none;
-        -webkit-text-fill-color: white;
+        -webkit-text-fill-color: rgb(var(--rgb-white));
     }
 
     .hero__grid,
@@ -141,6 +141,7 @@ import ArrowDownIcon from '@components/ArrowDownIcon.astro';
     const TRAIL_LENGTH = 12;
     const TRAIL_RADIUS_MAX = 2;
     const TRAIL_RADIUS_MIN = 1;
+    const TURN_BIAS = 0.5;
     const TWO_PI = Math.PI * 2;
     const TYPING_INTERVAL = 100;
     const TYPING_START_DELAY = 500;
@@ -149,6 +150,7 @@ import ArrowDownIcon from '@components/ArrowDownIcon.astro';
     let GRID_COLOR = '';
     let PULSE_COLOR = '';
     let PULSE_GLOW_COLOR = '';
+
     let arrowVisible = false;
     let gridIntervalId = 0;
     let rafId = 0;
@@ -181,20 +183,21 @@ import ArrowDownIcon from '@components/ArrowDownIcon.astro';
     }
 
     function initGrid(): void {
-        const section = document.querySelector('.hero');
         const gridCanvas = document.querySelector(
             '.hero__grid',
         ) as HTMLCanvasElement | null;
         const pulseCanvas = document.querySelector(
             '.hero__pulses',
         ) as HTMLCanvasElement | null;
-        if (!section || !gridCanvas || !pulseCanvas) return;
+        const section = document.querySelector('.hero');
+        if (!gridCanvas || !pulseCanvas || !section) return;
 
         const gridCtx = gridCanvas.getContext('2d');
         const pulseCtx = pulseCanvas.getContext('2d');
         if (!gridCtx || !pulseCtx) return;
 
         const pulses: Pulse[] = [];
+
         let gridComplete = false;
         let horizontalLines = 0;
         let isInitialResize = true;
@@ -316,6 +319,7 @@ import ArrowDownIcon from '@components/ArrowDownIcon.astro';
         function handleResize(): void {
             const width = (section as HTMLElement).offsetWidth;
             const height = (section as HTMLElement).offsetHeight;
+
             gridCanvas!.width = width;
             gridCanvas!.height = height;
             pulseCanvas!.width = width;
@@ -354,9 +358,9 @@ import ArrowDownIcon from '@components/ArrowDownIcon.astro';
             if (!shouldTurn) return;
 
             if (isHorizontal) {
-                pulse.dir = Math.random() > 0.5 ? 'down' : 'up';
+                pulse.dir = Math.random() > TURN_BIAS ? 'down' : 'up';
             } else {
-                pulse.dir = Math.random() > 0.5 ? 'left' : 'right';
+                pulse.dir = Math.random() > TURN_BIAS ? 'left' : 'right';
             }
         }
 
@@ -389,6 +393,7 @@ import ArrowDownIcon from '@components/ArrowDownIcon.astro';
             if (pulses.length >= MAX_PULSES) return;
 
             const edge = Math.floor(Math.random() * EDGE_COUNT);
+
             let dir: Direction;
             let x: number;
             let y: number;
@@ -458,17 +463,18 @@ import ArrowDownIcon from '@components/ArrowDownIcon.astro';
     }
 
     function initTypewriter(): void {
-        const title = document.querySelector(
-            '.hero__title',
-        ) as HTMLElement | null;
         const tagline = document.querySelector(
             '.hero__tagline',
+        ) as HTMLElement | null;
+        const title = document.querySelector(
+            '.hero__title',
         ) as HTMLElement | null;
         if (!title || title.dataset.typed) return;
 
         title.dataset.typed = 'true';
 
         const text = 'aephonics';
+
         let charIndex = 0;
         let cursorSpan: HTMLSpanElement | null = null;
         let textSpan: HTMLSpanElement | null = null;

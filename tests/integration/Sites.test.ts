@@ -42,10 +42,10 @@ describe('Sites', () => {
         const container = await AstroContainer.create();
         const html = await container.renderToString(Sites);
 
-        expect(html).toContain('Complexity tamed into elegant solutions');
-        expect(html).toContain('Building the systems that power tomorrow');
-        expect(html).toContain('Frequencies shaped into feeling');
-        expect(html).toContain('Worlds witnessed, moments preserved');
+        expect(html).toContain('Algorithms and data structures');
+        expect(html).toContain('Web engineering portfolio');
+        expect(html).toContain('Producer catalog');
+        expect(html).toContain('Interactive travel map');
     });
 
     test('card icons are hidden from assistive technology', async () => {
