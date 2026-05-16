@@ -2,6 +2,7 @@
 import '@fontsource/geist-sans/index.css';
 import { ClientRouter } from 'astro:transitions';
 
+import '@/styles.css';
 import Footer from '@sections/Footer.astro';
 
 interface Props {
@@ -35,6 +36,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
         <meta content={description} name="twitter:description" />
         <meta content={`${Astro.site}og.png`} name="twitter:image" />
         <script
+            is:inline
             set:html={JSON.stringify({
                 '@context': 'https://schema.org',
                 '@type': 'WebSite',
@@ -66,7 +68,6 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
         --color-orange: 249, 115, 22;
         --color-pink: 236, 72, 153;
         --font-sans: 'Geist', system-ui, sans-serif;
-        --rgb-white: 255, 255, 255;
     }
 
     :focus {
