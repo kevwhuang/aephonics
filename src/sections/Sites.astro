@@ -10,26 +10,26 @@ interface Site {
 
 const sites: Site[] = [
     {
-        color: 'rgb(var(--color-indigo))',
+        color: 'rgb(var(--color-cyan))',
         description: 'Algorithms and data structures',
         href: 'https://algo.aephonics.com',
         title: 'Algo',
     },
     {
-        color: 'rgb(var(--color-cyan))',
+        color: 'rgb(var(--color-indigo))',
         description: 'Web engineering portfolio',
         href: 'https://dev.aephonics.com',
         title: 'Dev',
     },
     {
-        color: 'rgb(var(--color-pink))',
+        color: 'rgb(var(--color-orange))',
         description: 'Producer catalog',
         href: 'https://music.aephonics.com',
         title: 'Music',
     },
     {
-        color: 'rgb(var(--color-orange))',
-        description: 'Interactive travel map',
+        color: 'rgb(var(--color-pink))',
+        description: 'Interactive map',
         href: 'https://travel.aephonics.com',
         title: 'Travel',
     },
@@ -101,7 +101,7 @@ const sites: Site[] = [
 
     .card:focus-visible,
     .card:hover {
-        background-color: rgba(var(--rgb-white), 0.06);
+        background-color: rgb(from var(--color-white) r g b / 0.06);
         border-color: color-mix(in srgb, var(--accent) 50%, transparent);
         box-shadow: 0 20px 40px -20px
             color-mix(in srgb, var(--accent) 30%, transparent);

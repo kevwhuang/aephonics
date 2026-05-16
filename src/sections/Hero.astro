@@ -36,7 +36,7 @@ import ArrowDownIcon from '@components/ArrowDownIcon.astro';
     .hero__cursor {
         animation: hero__blink 500ms steps(1) infinite;
         background: none;
-        -webkit-text-fill-color: rgb(var(--rgb-white));
+        -webkit-text-fill-color: var(--color-white);
     }
 
     .hero__grid,
@@ -45,32 +45,32 @@ import ArrowDownIcon from '@components/ArrowDownIcon.astro';
     }
 
     .hero__tag--atx {
-        color: rgba(var(--color-orange), 0.7);
-        text-shadow: 0 0 15px rgba(var(--color-orange), 0.3);
+        color: rgba(var(--color-pink), 0.7);
+        text-shadow: 0 0 15px rgba(var(--color-pink), 0.3);
     }
 
     .hero__tag--syntax {
-        color: rgba(var(--color-cyan), 0.7);
-        text-shadow: 0 0 15px rgba(var(--color-cyan), 0.3);
+        color: rgba(var(--color-indigo), 0.7);
+        text-shadow: 0 0 15px rgba(var(--color-indigo), 0.3);
     }
 
     .hero__tag--wavs {
-        color: rgba(var(--color-pink), 0.7);
-        text-shadow: 0 0 15px rgba(var(--color-pink), 0.3);
+        color: rgba(var(--color-orange), 0.7);
+        text-shadow: 0 0 15px rgba(var(--color-orange), 0.3);
     }
 
     .hero__title {
         background: linear-gradient(
             90deg,
-            rgba(var(--rgb-white), 0.75) 0%,
-            rgba(var(--rgb-white), 0.75) 40%,
-            rgba(var(--rgb-white), 1) 50%,
-            rgba(var(--rgb-white), 0.75) 60%,
-            rgba(var(--rgb-white), 0.75) 100%
+            rgb(from var(--color-white) r g b / 0.75) 0%,
+            rgb(from var(--color-white) r g b / 0.75) 40%,
+            rgb(from var(--color-white) r g b / 1) 50%,
+            rgb(from var(--color-white) r g b / 0.75) 60%,
+            rgb(from var(--color-white) r g b / 0.75) 100%
         );
         background-clip: text;
         background-size: 250% 100%;
-        filter: drop-shadow(0 0 40px rgba(var(--rgb-white), 0.12));
+        filter: drop-shadow(0 0 40px rgb(from var(--color-white) r g b / 0.12));
         font-variant-caps: small-caps;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
