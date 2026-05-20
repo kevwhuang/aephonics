@@ -1,0 +1,34 @@
+@import 'tailwindcss';
+
+@theme {
+    --color-cyan: 6, 182, 212;
+    --color-indigo: 99, 102, 241;
+    --color-orange: 249, 115, 22;
+    --color-pink: 236, 72, 153;
+    --font-sans: 'Geist', system-ui, sans-serif;
+}
+
+:focus {
+    outline: none;
+}
+
+:focus-visible {
+    border-radius: 2px;
+    outline: 2px solid rgba(var(--color-cyan), 0.8);
+    outline-offset: 2px;
+}
+
+[data-scroll] {
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
