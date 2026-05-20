@@ -45,7 +45,7 @@ describe('Sites', () => {
         expect(html).toContain('Algorithms and data structures');
         expect(html).toContain('Web engineering portfolio');
         expect(html).toContain('Producer catalog');
-        expect(html).toContain('Interactive travel map');
+        expect(html).toContain('Interactive map');
     });
 
     test('card icons are hidden from assistive technology', async () => {
