@@ -12,7 +12,9 @@ describe('Hero', () => {
         expect(html).toContain('hero__pulses');
 
         const canvasMatches = html.match(/<canvas[^>]*>/g) || [];
+
         expect(canvasMatches.length).toBe(2);
+
         canvasMatches.forEach((canvas) => {
             expect(canvas).toContain('aria-hidden="true"');
         });
@@ -23,7 +25,6 @@ describe('Hero', () => {
         const html = await container.renderToString(Hero);
 
         expect(html).toContain('aria-label="aephonics"');
-        expect(html).toContain('aephonics');
     });
 
     test('renders all three tagline tags', async () => {

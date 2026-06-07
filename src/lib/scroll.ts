@@ -1,7 +1,5 @@
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import gsap from 'gsap';
-
-type Direction = 'down' | 'left' | 'right' | 'up';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const SCROLL_OFFSET = 60;
 
@@ -14,9 +12,9 @@ export function initScrollAnimations(): void {
         const delay = parseFloat(element.dataset.scrollDelay || '0');
         const direction = (element.dataset.scroll || 'up') as Direction;
         const duration = parseFloat(element.dataset.scrollDuration || '0.8');
+        const from: gsap.TweenVars = { opacity: 0 };
         const stagger = parseFloat(element.dataset.scrollStagger || '0');
 
-        const from: gsap.TweenVars = { opacity: 0 };
         const to: gsap.TweenVars = {
             delay,
             duration,
@@ -42,14 +40,13 @@ export function initScrollAnimations(): void {
                 to.x = 0;
                 break;
             case 'up':
-            default:
                 from.y = SCROLL_OFFSET;
                 to.y = 0;
-                break;
         }
 
         if (stagger > 0) {
             const children = element.children;
+
             gsap.set(element, { opacity: 1 });
             gsap.set(children, from);
             to.stagger = stagger;

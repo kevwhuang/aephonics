@@ -11,6 +11,7 @@ test.describe('index page', () => {
 
     test('displays hero heading', async ({ page }) => {
         const h1 = page.locator('h1');
+
         await expect(h1).toHaveAttribute('aria-label', 'aephonics');
     });
 
@@ -28,8 +29,9 @@ test.describe('index page', () => {
     });
 
     test('footer displays current year', async ({ page }) => {
-        const year = new Date().getFullYear().toString();
         const footer = page.locator('footer');
+        const year = new Date().getFullYear().toString();
+
         await expect(footer).toContainText(year);
         await expect(footer).toContainText('Aephonics');
     });
