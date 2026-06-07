@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest';
 
 import Sites from '../../src/sections/Sites.astro';
 
-const expectedSites = [
+const SITES = [
     { href: 'https://algo.aephonics.com', title: 'Algo' },
     { href: 'https://dev.aephonics.com', title: 'Dev' },
     { href: 'https://music.aephonics.com', title: 'Music' },
@@ -15,7 +15,7 @@ describe('Sites', () => {
         const container = await AstroContainer.create();
         const html = await container.renderToString(Sites);
 
-        expectedSites.forEach(({ title }) => {
+        SITES.forEach(({ title }) => {
             expect(html).toContain(title);
         });
     });
@@ -24,7 +24,7 @@ describe('Sites', () => {
         const container = await AstroContainer.create();
         const html = await container.renderToString(Sites);
 
-        expectedSites.forEach(({ href }) => {
+        SITES.forEach(({ href }) => {
             expect(html).toContain(`href="${href}"`);
         });
     });
@@ -33,7 +33,7 @@ describe('Sites', () => {
         const container = await AstroContainer.create();
         const html = await container.renderToString(Sites);
 
-        expectedSites.forEach(({ title }) => {
+        SITES.forEach(({ title }) => {
             expect(html).toContain(`aria-label="Visit ${title}"`);
         });
     });
@@ -53,7 +53,9 @@ describe('Sites', () => {
         const html = await container.renderToString(Sites);
 
         const svgMatches = html.match(/<svg[^>]*>/g) || [];
+
         expect(svgMatches.length).toBe(4);
+
         svgMatches.forEach((svg) => {
             expect(svg).toContain('aria-hidden="true"');
         });
