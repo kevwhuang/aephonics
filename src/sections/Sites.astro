@@ -1,14 +1,7 @@
 ---
 import IconArrowUpRight from '@components/IconArrowUpRight.astro';
 
-interface Site {
-    color: string;
-    description: string;
-    href: string;
-    title: string;
-}
-
-const SITES: Site[] = [
+const SITES = [
     {
         color: 'var(--color-cyan)',
         description: 'Algorithms and data structures',
@@ -33,92 +26,85 @@ const SITES: Site[] = [
         href: 'https://travel.aephonics.com',
         title: 'Travel',
     },
-];
+] as const;
 ---
 
-<section class="px-[clamp(1rem,calc(0.5rem+2.5vw),2.5rem)] py-[clamp(3rem,calc(1.33rem+8.33vw),8rem)] bg-zinc-950">
-    <div class="grid grid-cols-1 max-w-7xl mx-auto gap-[clamp(1.5rem,calc(1rem+2.5vw),3rem)] md:grid-cols-2">
+<section class="section" aria-label="Site directory">
+    <ul
+        class="shell grid grid-cols-2 gap-[clamp(1.5rem,calc(1rem+2.5vw),3rem)] list-none max-md:grid-cols-1"
+        data-scroll="up"
+        data-scroll-stagger="0.1"
+    >
         {
             SITES.map(({ color, description, href, title }) => (
-                <a
-                    class="card active:scale-[0.99] focus-visible:-translate-y-1 hover:-translate-y-1 group overflow-hidden relative min-h-[clamp(6rem,calc(5.33rem+3.33vw),8rem)] p-[clamp(1.5rem,calc(0.67rem+4.17vw),4rem)] border border-white-10 bg-white-5"
-                    aria-label={`Visit ${title}`}
-                    data-scroll="up"
-                    href={href}
-                    style={`--accent: ${color}`}
-                >
-                    <div class="card__glow group-focus-visible:opacity-100 group-hover:opacity-100 absolute -inset-0.5 duration-300 opacity-0 transition-opacity" />
-                    <div class="card__radial group-focus-visible:opacity-100 group-hover:opacity-100 absolute inset-0 duration-300 opacity-0 transition-opacity" />
-                    <div class="card__line group-focus-visible:w-full group-hover:w-full absolute bottom-0 left-0 h-0.5 w-0 duration-300 ease-in-out transition-[width]" />
-                    <div class="relative z-10">
-                        <h2 class="card__title mb-[clamp(0.5rem,calc(0.33rem+0.83vw),1rem)] font-bold text-[clamp(1.5rem,calc(1.25rem+1.25vw),2.25rem)] tracking-tight text-white duration-300 transition-colors">
-                            {title}
-                        </h2>
-                        <p class="group-focus-visible:text-zinc-300 group-hover:text-zinc-300 text-[clamp(0.875rem,calc(0.83rem+0.21vw),1rem)] text-zinc-400 duration-300 transition-colors">
-                            {description}
-                        </p>
-                    </div>
-                    <IconArrowUpRight />
-                </a>
+                <li>
+                    <a
+                        class="sites__card active:scale-[0.99] focus-visible:-translate-y-1 hover:-translate-y-1 block group overflow-hidden relative isolate h-full min-h-[clamp(6rem,calc(5.3333rem+3.3333vw),8rem)] p-[clamp(1.5rem,calc(0.6667rem+4.1667vw),4rem)] border border-white-10 bg-white-5"
+                        aria-label={`Visit ${title}`}
+                        href={href}
+                        rel="noopener"
+                        style={`--accent: ${color}`}
+                        target="_blank"
+                    >
+                        <div class="sites__glow group-focus-visible:opacity-100 group-hover:opacity-100 -inset-0.5 absolute duration-(--duration-base) ease-[ease] opacity-0 transition-opacity" aria-hidden="true" />
+                        <div class="sites__radial group-focus-visible:opacity-100 group-hover:opacity-100 absolute inset-0 duration-(--duration-base) ease-[ease] opacity-0 transition-opacity" aria-hidden="true" />
+                        <div class="sites__line group-focus-visible:w-full group-hover:w-full absolute bottom-0 left-0 h-0.5 w-0 duration-(--duration-base) ease-[ease] transition-[width]" aria-hidden="true" />
+                        <div class="relative z-[1]">
+                            <h2 class="sites__title mb-[clamp(0.5rem,calc(0.3333rem+0.8333vw),1rem)] font-bold text-[clamp(1.5rem,calc(1.25rem+1.25vw),2.25rem)] tracking-tight text-white duration-(--duration-base) ease-[ease] transition-[color,text-shadow]">
+                                {title}
+                            </h2>
+                            <p class="group-focus-visible:text-zinc-300 group-hover:text-zinc-300 text-base text-zinc-400 duration-(--duration-base) ease-[ease] transition-colors">
+                                {description}
+                            </p>
+                        </div>
+                        <IconArrowUpRight />
+                    </a>
+                </li>
             ))
         }
-    </div>
+    </ul>
 </section>
 
 <style>
-    .card {
+    .sites__card {
+        --accent-50: color-mix(in srgb, var(--accent) 50%, transparent);
         transition:
-            background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-            border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-            box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-            transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-color var(--duration-base) ease,
+            box-shadow var(--duration-base) ease,
+            scale var(--duration-base) ease,
+            translate var(--duration-base) ease;
     }
 
-    .card:focus-visible,
-    .card:hover {
-        background-color: var(--color-white-5);
-        border-color: color-mix(in srgb, var(--accent) 50%, transparent);
-        box-shadow: 0 20px 40px -20px
-            color-mix(in srgb, var(--accent) 30%, transparent);
+    .sites__card:focus-visible,
+    .sites__card:hover {
+        border-color: var(--accent-50);
+        box-shadow: 0 1.25rem 2.5rem -1.25rem color-mix(in srgb, var(--accent) 30%, transparent);
     }
 
-    .card:focus-visible .card__glow,
-    .card:hover .card__glow {
-        animation: card__glow 2s ease-in-out infinite;
+    .sites__card:focus-visible .sites__glow,
+    .sites__card:hover .sites__glow {
+        animation: sites__sweep 2s ease-in-out infinite;
     }
 
-    .card:focus-visible .card__icon,
-    .card:hover .card__icon {
+    .sites__card:focus-visible .sites__title,
+    .sites__card:hover .sites__title {
         color: var(--accent);
-        filter: drop-shadow(
-            0 0 8px color-mix(in srgb, var(--accent) 50%, transparent)
-        );
+        text-shadow: 0 0 1.875rem var(--accent-50);
     }
 
-    .card:focus-visible .card__title,
-    .card:hover .card__title {
-        color: var(--accent);
-        text-shadow: 0 0 30px color-mix(in srgb, var(--accent) 50%, transparent);
+    .sites__glow {
+        background: linear-gradient(to bottom right, transparent, color-mix(in srgb, var(--accent) 10%, transparent), transparent);
     }
 
-    .card__glow {
-        background: linear-gradient(
-            to bottom right,
-            transparent,
-            color-mix(in srgb, var(--accent) 10%, transparent),
-            transparent
-        );
-    }
-
-    .card__line {
+    .sites__line {
         background: linear-gradient(to right, var(--accent), color-mix(in srgb, var(--accent) 60%, var(--color-white)));
     }
 
-    .card__radial {
+    .sites__radial {
         background: radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--accent) 15%, transparent) 0%, transparent 50%);
     }
 
-    @keyframes card__glow {
+    @keyframes sites__sweep {
         0%,
         100% {
             transform: translateX(-100%);

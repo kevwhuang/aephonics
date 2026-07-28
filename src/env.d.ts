@@ -2,4 +2,7 @@
 
 declare module 'eslint-plugin-jsx-a11y';
 
-type Direction = 'down' | 'left' | 'right' | 'up';
+interface ImportMetaEnv {
+    readonly SUPABASE_PUBLISHABLE_KEY: string;
+    readonly SUPABASE_URL: string;
+}
