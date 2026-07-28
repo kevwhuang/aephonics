@@ -2,6 +2,10 @@
 
 @theme {
     --color-cyan: #06b6d4;
+    --color-cyan-15: #06b6d426;
+    --color-cyan-20: #06b6d433;
+    --color-cyan-30: #06b6d44d;
+    --color-cyan-35: #06b6d459;
     --color-cyan-80: #06b6d4cc;
     --color-indigo: #6366f1;
     --color-indigo-30: #6366f14d;
@@ -20,22 +24,58 @@
     --color-white-50: #ffffff80;
     --color-white-60: #ffffff99;
     --color-white-75: #ffffffbf;
-    --font-mono: 'Geist Mono', ui-monospace, monospace;
-    --font-sans: 'Geist', system-ui, sans-serif;
+    --font-mono:
+        'Geist Mono',
+        ui-monospace,
+        monospace;
+    --font-sans:
+        'Geist Sans',
+        system-ui,
+        sans-serif;
+}
+
+:root {
+    --duration-base: 0.3s;
+    --duration-entrance: 2s;
+    --duration-fast: 0.15s;
+    --duration-slow: 0.5s;
+}
+
+a,
+button,
+label,
+select {
+    cursor: pointer;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+html[data-astro-transition] {
+    scroll-behavior: auto;
+}
+
+:disabled {
+    cursor: not-allowed;
 }
 
 :focus {
     outline: none;
 }
 
-:focus-visible:not(input) {
-    border-radius: 2px;
-    outline: 2px solid var(--color-cyan-80);
-    outline-offset: 2px;
+:focus-visible:not(input, select, textarea) {
+    border-radius: 0.125rem;
+    outline: 0.125rem solid var(--color-cyan-80);
+    outline-offset: 0.125rem;
 }
 
 ::placeholder {
     user-select: none;
+}
+
+::selection {
+    background: var(--color-cyan-20);
 }
 
 [data-scroll] {
@@ -44,11 +84,13 @@
 
 @media (prefers-reduced-motion: reduce) {
     *,
-    *::before,
-    *::after {
+    *::after,
+    *::before {
+        animation-delay: 0s !important;
         animation-duration: 0.01s !important;
         animation-iteration-count: 1 !important;
         scroll-behavior: auto !important;
+        transition-delay: 0s !important;
         transition-duration: 0.01s !important;
     }
 }

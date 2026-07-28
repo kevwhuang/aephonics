@@ -1,0 +1,8 @@
+.section {
+    padding: clamp(3rem, calc(1.3333rem + 8.3333vw), 8rem) clamp(1rem, calc(0.5rem + 2.5vw), 2.5rem);
+}
+
+.shell {
+    margin-inline: auto;
+    max-width: 80rem;
+}

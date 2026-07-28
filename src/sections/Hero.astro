@@ -3,30 +3,31 @@ import IconArrowDown from '@components/IconArrowDown.astro';
 ---
 
 <section
-    class="hero flex items-center justify-center overflow-hidden relative min-h-screen"
+    class="hero grid grid-rows-[1fr_auto] isolate overflow-hidden relative min-h-svh"
+    aria-labelledby="hero-title"
 >
-    <canvas class="hero__grid absolute inset-0" aria-hidden="true"></canvas>
-    <canvas class="hero__pulses absolute inset-0" aria-hidden="true"></canvas>
+    <canvas class="hero__grid absolute inset-0" aria-hidden="true" />
+    <canvas class="hero__pulses absolute inset-0" aria-hidden="true" />
     <div
-        class="hero__content relative z-10 max-w-7xl px-[clamp(1rem,calc(0.5rem+2.5vw),2.5rem)] text-center select-none"
+        class="hero__content place-self-center relative z-[1] px-[clamp(1rem,calc(0.5rem+2.5vw),2.5rem)] text-center"
     >
         <h1
-            class="hero__title mb-[clamp(1rem,calc(0.33rem+3.33vw),3rem)] font-extralight leading-none text-[clamp(2.5rem,calc(-0.67rem+15.83vw),12rem)] tracking-wide"
-            aria-label="aephonics"
+            id="hero-title"
+            class="hero__title mb-[clamp(1rem,calc(0.3333rem+3.3333vw),3rem)] font-extralight leading-none text-[min(clamp(2.5rem,calc(-0.6667rem+15.8333vw),12rem),26svh)] tracking-wide uppercase bg-clip-text text-transparent drop-shadow-[0_0_2.5rem_var(--color-white-10)] select-none"
+            aria-label="Aephonics"
         >
+            <span class="hero__text" /><span class="hero__cursor">|</span>
         </h1>
-        <p
-            class="hero__tagline max-w-2xl mx-auto font-mono lowercase text-[clamp(0.875rem,calc(0.58rem+1.46vw),1.75rem)] tracking-[clamp(0.25rem,calc(0.17rem+0.42vw),0.5rem)] opacity-0"
+        <ul
+            class="hero__tagline flex justify-center gap-[0.9em] font-mono list-none lowercase text-[clamp(0.875rem,calc(0.5833rem+1.4583vw),1.75rem)] tracking-[clamp(0.25rem,calc(0.1667rem+0.4167vw),0.5rem)] opacity-0 select-none"
         >
-            <span class="hero__tag hero__tag--atx">atx</span>
-            <span class="text-zinc-600">/</span>
-            <span class="hero__tag hero__tag--syntax">syntax</span>
-            <span class="text-zinc-600">/</span>
-            <span class="hero__tag hero__tag--wavs">wavs</span>
-        </p>
+            <li class="hero__tag hero__tag--atx before:text-zinc-600 text-pink-70 text-shadow-[0_0_0.9375rem_var(--color-pink-30)]">atx</li>
+            <li class="hero__tag hero__tag--syntax before:text-zinc-600 text-indigo-70 text-shadow-[0_0_0.9375rem_var(--color-indigo-30)]">syntax</li>
+            <li class="hero__tag hero__tag--wavs before:text-zinc-600 text-orange-70 text-shadow-[0_0_0.9375rem_var(--color-orange-30)]">wavs</li>
+        </ul>
     </div>
     <div
-        class="hero__arrow absolute bottom-[clamp(2rem,calc(1.67rem+1.67vw),3rem)] left-1/2 p-2 opacity-0 -translate-x-1/2 animate-bounce transition-opacity duration-500"
+        class="hero__arrow justify-self-center relative z-[1] mb-[clamp(2rem,calc(1.6667rem+1.6667vw),3rem)] p-2 animate-bounce duration-(--duration-slow) ease-[ease] opacity-0 transition-opacity"
     >
         <IconArrowDown />
     </div>
@@ -35,43 +36,31 @@ import IconArrowDown from '@components/IconArrowDown.astro';
 <style>
     .hero__cursor {
         animation: hero__blink 0.5s steps(1) infinite;
-        -webkit-text-fill-color: var(--color-white);
+        color: var(--color-white);
     }
 
     .hero__grid,
     .hero__pulses {
-        animation: hero__fade-in 2s ease-out forwards;
+        --hero-canvas-opacity: 0.6;
+        animation: hero__fade-in var(--duration-entrance) ease-out both;
     }
 
-    .hero__tag--atx {
-        color: var(--color-pink-70);
-        text-shadow: 0 0 15px var(--color-pink-30);
+    .hero__grid[data-revealed],
+    .hero__pulses[data-revealed] {
+        animation: none;
+        opacity: var(--hero-canvas-opacity);
     }
 
-    .hero__tag--syntax {
-        color: var(--color-indigo-70);
-        text-shadow: 0 0 15px var(--color-indigo-30);
-    }
-
-    .hero__tag--wavs {
-        color: var(--color-orange-70);
-        text-shadow: 0 0 15px var(--color-orange-30);
+    .hero__tag + .hero__tag::before {
+        content: '/';
+        padding-right: 0.9em;
     }
 
     .hero__title {
-        background: linear-gradient(
-            90deg,
-            var(--color-white-75) 0%,
-            var(--color-white-75) 40%,
-            var(--color-white) 50%,
-            var(--color-white-75) 60%,
-            var(--color-white-75) 100%
-        );
-        background-clip: text;
+        background-image: linear-gradient(90deg, var(--color-white-75) 0%, var(--color-white-75) 40%, var(--color-white) 50%, var(--color-white-75) 60%, var(--color-white-75) 100%);
         background-size: 250% 100%;
-        filter: drop-shadow(0 0 40px var(--color-white-10));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        filter: blur(0.5rem);
+        transition: filter 1.5s ease-out;
     }
 
     @keyframes hero__blink {
@@ -86,23 +75,27 @@ import IconArrowDown from '@components/IconArrowDown.astro';
         }
 
         100% {
-            opacity: 0.6;
+            opacity: var(--hero-canvas-opacity);
         }
     }
 
-    @keyframes hero__title {
+    @keyframes hero__shimmer {
         0%,
         100% {
-            background-position: 150% 50%;
+            filter: drop-shadow(0 0 2.5rem var(--color-white-10)) brightness(1);
         }
 
         50% {
-            background-position: -50% 50%;
+            filter: drop-shadow(0 0 2.5rem var(--color-white-10)) brightness(1.25);
         }
     }
 </style>
 
 <script>
+    import { REDUCED_MOTION_QUERY } from '@lib/constants';
+
+    type Direction = 'down' | 'left' | 'right' | 'up';
+
     interface Point {
         x: number;
         y: number;
@@ -113,12 +106,25 @@ import IconArrowDown from '@components/IconArrowDown.astro';
         trail: Point[];
     }
 
+    const ALPHA_MAX = 255;
     const ARROW_SHOW_DELAY = 2_000;
-    const CANVAS_OPACITY = '0.6';
+
+    const DIRECTION_DELTAS: Record<Direction, Point> = {
+        down: { x: 0, y: 1 },
+        left: { x: -1, y: 0 },
+        right: { x: 1, y: 0 },
+        up: { x: 0, y: -1 },
+    };
+
     const EDGE_COUNT = 4;
+    const EDGE_LEFT = 0;
+    const EDGE_RIGHT = 2;
+    const EDGE_TOP = 1;
     const GRID_DRAW_INTERVAL = 30;
     const GRID_LINE_WIDTH = 1;
     const GRID_SIZE = 100;
+    const HEX_PAD_WIDTH = 2;
+    const HEX_RADIX = 16;
     const MAX_PULSES = 5;
     const OFFSCREEN_MARGIN = 50;
     const PULSE_HEAD_RADIUS = 3;
@@ -127,13 +133,12 @@ import IconArrowDown from '@components/IconArrowDown.astro';
     const PULSE_SPEED = 3;
     const PULSE_START_DELAY = 800;
     const SCROLL_THRESHOLD = 50;
-    const SEQUENCE_START_DELAY = 2_200;
     const STRAIGHT_PROBABILITY = 0.92;
     const TAGLINE_FADE_DELAY = 800;
-    const TITLE_INITIAL_BLUR = 8;
+    const TAGLINE_FADE_DURATION = 1;
     const TITLE_SHIMMER_DELAY = 1_000;
     const TITLE_SHIMMER_DURATION = 10;
-    const TITLE_TEXT = 'AEPHONICS';
+    const TITLE_TEXT = 'Aephonics';
     const TRAIL_ALPHA = 0.15;
     const TRAIL_LENGTH = 12;
     const TRAIL_RADIUS_MAX = 2;
@@ -141,354 +146,381 @@ import IconArrowDown from '@components/IconArrowDown.astro';
     const TURN_BIAS = 0.5;
     const TWO_PI = Math.PI * 2;
     const TYPING_INTERVAL = 100;
-    const TYPING_START_DELAY = 500;
+    const TYPING_START_DELAY = 1_000;
+
+    const reducedMotionQuery = window.matchMedia(REDUCED_MOTION_QUERY);
 
     let animationFrameId = 0;
-    let arrowVisible = false;
+    let arrow: HTMLElement | null = null;
+    let characterIndex = 0;
+    let controller = new AbortController();
+    let cursorSpan: HTMLSpanElement | null = null;
     let cyan = '';
     let cyan15 = '';
     let cyan30 = '';
     let cyan35 = '';
+    let gridCanvas: HTMLCanvasElement | null = null;
+    let gridContext: CanvasRenderingContext2D | null = null;
     let gridIntervalId = 0;
-    let resizeHandler: (() => void) | null = null;
-    let scrollHandler: (() => void) | null = null;
+    let horizontalLineCount = 0;
+    let isArrowVisible = false;
+    let isGridComplete = false;
+    let isInitialResize = true;
+    let maxHorizontalLineCount = 0;
+    let maxVerticalLineCount = 0;
+    let pulseCanvas: HTMLCanvasElement | null = null;
+    let pulseContext: CanvasRenderingContext2D | null = null;
+    let pulses: Pulse[] = [];
+    let section: HTMLElement | null = null;
     let spawnIntervalId = 0;
-    let startPulsesCallback: (() => void) | null = null;
+    let tagline: HTMLElement | null = null;
+    let textSpan: HTMLSpanElement | null = null;
+    let timeoutIds: number[] = [];
+    let title: HTMLElement | null = null;
+    let trailColors: string[] = [];
+    let trailRadii: number[] = [];
+    let verticalLineCount = 0;
 
-    function cleanup() {
+    function animatePulses() {
+        if (!pulseCanvas || !pulseContext) return;
+
+        pulseContext.clearRect(0, 0, pulseCanvas.width, pulseCanvas.height);
+
+        for (let pulseIndex = pulses.length - 1; pulseIndex >= 0; pulseIndex--) {
+            const pulse = pulses[pulseIndex];
+
+            const delta = DIRECTION_DELTAS[pulse.direction];
+
+            pulse.trail.unshift({ x: pulse.x, y: pulse.y });
+
+            if (pulse.trail.length > TRAIL_LENGTH) pulse.trail.pop();
+
+            pulse.x += delta.x * PULSE_SPEED;
+            pulse.y += delta.y * PULSE_SPEED;
+
+            const isHorizontal = delta.x !== 0;
+
+            const position = isHorizontal ? pulse.x : pulse.y;
+
+            const shouldTurn = Math.abs(position % GRID_SIZE) < PULSE_SPEED
+                && Math.random() > STRAIGHT_PROBABILITY;
+
+            if (shouldTurn) {
+                if (isHorizontal) pulse.direction = Math.random() > TURN_BIAS ? 'down' : 'up';
+                else pulse.direction = Math.random() > TURN_BIAS ? 'left' : 'right';
+            }
+
+            for (let trailIndex = 0; trailIndex < pulse.trail.length; trailIndex++) {
+                const point = pulse.trail[trailIndex];
+
+                pulseContext.fillStyle = trailColors[trailIndex];
+                pulseContext.beginPath();
+                pulseContext.arc(point.x, point.y, trailRadii[trailIndex], 0, TWO_PI);
+                pulseContext.fill();
+            }
+
+            pulseContext.fillStyle = cyan35;
+            pulseContext.shadowBlur = PULSE_SHADOW_BLUR;
+            pulseContext.shadowColor = cyan30;
+            pulseContext.beginPath();
+            pulseContext.arc(pulse.x, pulse.y, PULSE_HEAD_RADIUS, 0, TWO_PI);
+            pulseContext.fill();
+            pulseContext.shadowBlur = 0;
+
+            const isOffscreen = pulse.x < -OFFSCREEN_MARGIN
+                || pulse.x > pulseCanvas.width + OFFSCREEN_MARGIN
+                || pulse.y < -OFFSCREEN_MARGIN
+                || pulse.y > pulseCanvas.height + OFFSCREEN_MARGIN;
+
+            if (isOffscreen) pulses.splice(pulseIndex, 1);
+        }
+
+        animationFrameId = requestAnimationFrame(animatePulses);
+    }
+
+    function buildTrailStyles() {
+        trailColors = [];
+        trailRadii = [];
+
+        for (let index = 0; index < TRAIL_LENGTH; index++) {
+            const fade = 1 - index / TRAIL_LENGTH;
+
+            const alpha = Math.round(fade * TRAIL_ALPHA * ALPHA_MAX).toString(HEX_RADIX).padStart(HEX_PAD_WIDTH, '0');
+
+            trailColors.push(cyan + alpha);
+            trailRadii.push(fade * TRAIL_RADIUS_MAX + TRAIL_RADIUS_MIN);
+        }
+    }
+
+    function drawGridLines(width: number, height: number) {
+        if (!gridContext) return;
+
+        gridContext.clearRect(0, 0, width, height);
+        gridContext.lineWidth = GRID_LINE_WIDTH;
+        gridContext.strokeStyle = cyan15;
+
+        for (let y = 0; y <= height; y += GRID_SIZE) {
+            drawLine(0, y, width, y);
+        }
+
+        for (let x = 0; x <= width; x += GRID_SIZE) {
+            drawLine(x, 0, x, height);
+        }
+    }
+
+    function drawLine(x1: number, y1: number, x2: number, y2: number) {
+        if (!gridContext) return;
+
+        gridContext.beginPath();
+        gridContext.moveTo(x1, y1);
+        gridContext.lineTo(x2, y2);
+        gridContext.stroke();
+    }
+
+    function drawNextGridLine() {
+        if (isGridComplete) {
+            clearInterval(gridIntervalId);
+            revealCanvases();
+
+            return;
+        }
+
+        if (!gridCanvas) return;
+
+        if (horizontalLineCount < maxHorizontalLineCount) {
+            drawLine(0, horizontalLineCount * GRID_SIZE, gridCanvas.width, horizontalLineCount * GRID_SIZE);
+            horizontalLineCount++;
+        } else if (verticalLineCount < maxVerticalLineCount) {
+            drawLine(verticalLineCount * GRID_SIZE, 0, verticalLineCount * GRID_SIZE, gridCanvas.height);
+            verticalLineCount++;
+        } else {
+            isGridComplete = true;
+        }
+    }
+
+    function handleResize() {
+        if (!gridCanvas || !gridContext || !pulseCanvas || !section) return;
+
+        const height = section.offsetHeight;
+        const width = section.offsetWidth;
+
+        gridCanvas.height = height;
+        gridCanvas.width = width;
+        gridContext.lineWidth = GRID_LINE_WIDTH;
+        gridContext.strokeStyle = cyan15;
+        maxHorizontalLineCount = Math.ceil(height / GRID_SIZE) + 1;
+        maxVerticalLineCount = Math.ceil(width / GRID_SIZE) + 1;
+        pulseCanvas.height = height;
+        pulseCanvas.width = width;
+
+        if (isInitialResize) {
+            isInitialResize = false;
+
+            return;
+        }
+
+        isGridComplete = true;
+        drawGridLines(width, height);
+        revealCanvases();
+    }
+
+    function handleScroll() {
+        if (!arrow || !isArrowVisible) return;
+
+        arrow.style.opacity = window.scrollY > SCROLL_THRESHOLD ? '0' : '1';
+    }
+
+    function initGrid() {
+        gridCanvas = document.querySelector<HTMLCanvasElement>('.hero__grid');
+        pulseCanvas = document.querySelector<HTMLCanvasElement>('.hero__pulses');
+        section = document.querySelector<HTMLElement>('.hero');
+
+        if (!gridCanvas || !pulseCanvas || !section) return;
+
+        gridContext = gridCanvas.getContext('2d');
+        pulseContext = pulseCanvas.getContext('2d');
+
+        if (!gridContext || !pulseContext) return;
+
+        handleResize();
+        window.addEventListener('resize', handleResize, { signal: controller.signal });
+
+        if (reducedMotionQuery.matches) {
+            isGridComplete = true;
+            drawGridLines(gridCanvas.width, gridCanvas.height);
+            revealCanvases();
+
+            return;
+        }
+
+        gridIntervalId = window.setInterval(drawNextGridLine, GRID_DRAW_INTERVAL);
+    }
+
+    function initHero() {
+        controller.abort();
+
+        const styles = getComputedStyle(document.documentElement);
+
+        controller = new AbortController();
+        cyan = styles.getPropertyValue('--color-cyan').trim();
+        cyan15 = styles.getPropertyValue('--color-cyan-15').trim();
+        cyan30 = styles.getPropertyValue('--color-cyan-30').trim();
+        cyan35 = styles.getPropertyValue('--color-cyan-35').trim();
+        horizontalLineCount = 0;
+        isArrowVisible = false;
+        isGridComplete = false;
+        isInitialResize = true;
+        pulses = [];
+        verticalLineCount = 0;
+        buildTrailStyles();
         cancelAnimationFrame(animationFrameId);
         clearInterval(gridIntervalId);
         clearInterval(spawnIntervalId);
 
-        if (resizeHandler) {
-            window.removeEventListener('resize', resizeHandler);
-            resizeHandler = null;
+        for (const timeoutId of timeoutIds) {
+            clearTimeout(timeoutId);
         }
 
-        if (scrollHandler) {
-            window.removeEventListener('scroll', scrollHandler);
-            scrollHandler = null;
-        }
-    }
-
-    function drawLine(
-        ctx: CanvasRenderingContext2D,
-        x1: number,
-        y1: number,
-        x2: number,
-        y2: number,
-    ) {
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
-    }
-
-    function hexAlpha(hex: string, alpha: number) {
-        return hex + Math.round(alpha * 255).toString(16).padStart(2, '0');
-    }
-
-    function init() {
-        const styles = getComputedStyle(document.documentElement);
-
-        cleanup();
-        arrowVisible = false;
-        cyan = styles.getPropertyValue('--color-cyan').trim();
-        startPulsesCallback = null;
-
-        cyan15 = hexAlpha(cyan, 0.15);
-        cyan30 = hexAlpha(cyan, 0.3);
-        cyan35 = hexAlpha(cyan, 0.35);
-
+        timeoutIds = [];
         initGrid();
         initScrollArrow();
         initTypewriter();
     }
 
-    function initGrid() {
-        const gridCanvas = document.querySelector<HTMLCanvasElement>('.hero__grid');
-        const pulseCanvas = document.querySelector<HTMLCanvasElement>('.hero__pulses');
-        const section = document.querySelector<HTMLElement>('.hero');
-
-        if (!gridCanvas || !pulseCanvas || !section) return;
-
-        const gridCtx = gridCanvas.getContext('2d');
-        const pulseCtx = pulseCanvas.getContext('2d');
-        const pulses: Pulse[] = [];
-
-        if (!gridCtx || !pulseCtx) return;
-
-        let gridComplete = false;
-        let horizontalLines = 0;
-        let isInitialResize = true;
-        let maxHorizontalLines = 0;
-        let maxVerticalLines = 0;
-        let verticalLines = 0;
-
-        function animatePulses() {
-            pulseCtx!.clearRect(0, 0, pulseCanvas!.width, pulseCanvas!.height);
-
-            for (let i = pulses.length - 1; i >= 0; i--) {
-                const pulse = pulses[i];
-
-                pulse.trail.unshift({ x: pulse.x, y: pulse.y });
-
-                if (pulse.trail.length > TRAIL_LENGTH) pulse.trail.pop();
-
-                switch (pulse.direction) {
-                    case 'down':
-                        pulse.y += PULSE_SPEED;
-                        break;
-                    case 'left':
-                        pulse.x -= PULSE_SPEED;
-                        break;
-                    case 'right':
-                        pulse.x += PULSE_SPEED;
-                        break;
-                    case 'up':
-                        pulse.y -= PULSE_SPEED;
-                }
-
-                const isHorizontal = pulse.direction === 'left' || pulse.direction === 'right';
-
-                const position = isHorizontal ? pulse.x : pulse.y;
-
-                const shouldTurn = Math.abs(position % GRID_SIZE) < PULSE_SPEED
-                    && Math.random() > STRAIGHT_PROBABILITY;
-
-                if (shouldTurn) {
-                    if (isHorizontal) {
-                        pulse.direction = Math.random() > TURN_BIAS ? 'down' : 'up';
-                    } else {
-                        pulse.direction = Math.random() > TURN_BIAS ? 'left' : 'right';
-                    }
-                }
-
-                for (let j = 0; j < pulse.trail.length; j++) {
-                    const alpha = (1 - j / TRAIL_LENGTH) * TRAIL_ALPHA;
-                    const radius = (1 - j / TRAIL_LENGTH) * TRAIL_RADIUS_MAX + TRAIL_RADIUS_MIN;
-
-                    pulseCtx!.fillStyle = hexAlpha(cyan, alpha);
-                    pulseCtx!.beginPath();
-                    pulseCtx!.arc(pulse.trail[j].x, pulse.trail[j].y, radius, 0, TWO_PI);
-                    pulseCtx!.fill();
-                }
-
-                pulseCtx!.fillStyle = cyan35;
-                pulseCtx!.shadowBlur = PULSE_SHADOW_BLUR;
-                pulseCtx!.shadowColor = cyan30;
-                pulseCtx!.beginPath();
-                pulseCtx!.arc(pulse.x, pulse.y, PULSE_HEAD_RADIUS, 0, TWO_PI);
-                pulseCtx!.fill();
-                pulseCtx!.shadowBlur = 0;
-
-                const offscreen = pulse.x < -OFFSCREEN_MARGIN
-                    || pulse.x > pulseCanvas!.width + OFFSCREEN_MARGIN
-                    || pulse.y < -OFFSCREEN_MARGIN
-                    || pulse.y > pulseCanvas!.height + OFFSCREEN_MARGIN;
-
-                if (offscreen) pulses.splice(i, 1);
-            }
-
-            animationFrameId = requestAnimationFrame(animatePulses);
-        }
-
-        function handleResize() {
-            const height = section!.offsetHeight;
-            const width = section!.offsetWidth;
-
-            gridCanvas!.height = height;
-            gridCanvas!.width = width;
-            pulseCanvas!.height = height;
-            pulseCanvas!.width = width;
-            maxHorizontalLines = Math.ceil(height / GRID_SIZE) + 1;
-            maxVerticalLines = Math.ceil(width / GRID_SIZE) + 1;
-
-            if (!isInitialResize) {
-                const ctx = gridCtx!;
-                const h = gridCanvas!.height;
-                const w = gridCanvas!.width;
-
-                gridCanvas!.style.animation = 'none';
-                gridCanvas!.style.opacity = CANVAS_OPACITY;
-                gridComplete = true;
-                pulseCanvas!.style.animation = 'none';
-                pulseCanvas!.style.opacity = CANVAS_OPACITY;
-                ctx.clearRect(0, 0, w, h);
-                ctx.lineWidth = GRID_LINE_WIDTH;
-                ctx.strokeStyle = cyan15;
-
-                for (let y = 0; y <= h; y += GRID_SIZE) {
-                    drawLine(ctx, 0, y, w, y);
-                }
-
-                for (let x = 0; x <= w; x += GRID_SIZE) {
-                    drawLine(ctx, x, 0, x, h);
-                }
-            }
-
-            isInitialResize = false;
-        }
-
-        function randomGridX() {
-            return Math.floor(Math.random() * maxVerticalLines) * GRID_SIZE;
-        }
-
-        function randomGridY() {
-            return Math.floor(Math.random() * maxHorizontalLines) * GRID_SIZE;
-        }
-
-        function spawnPulse() {
-            if (pulses.length >= MAX_PULSES) return;
-
-            const edge = Math.floor(Math.random() * EDGE_COUNT);
-
-            let direction: Direction;
-            let x: number;
-            let y: number;
-
-            switch (edge) {
-                case 0:
-                    direction = 'right';
-                    x = 0;
-                    y = randomGridY();
-                    break;
-                case 1:
-                    direction = 'down';
-                    x = randomGridX();
-                    y = 0;
-                    break;
-                case 2:
-                    direction = 'left';
-                    x = gridCanvas!.width;
-                    y = randomGridY();
-                    break;
-                default:
-                    direction = 'up';
-                    x = randomGridX();
-                    y = gridCanvas!.height;
-            }
-
-            pulses.push({ direction, trail: [], x, y });
-        }
-
-        function startPulses() {
-            animatePulses();
-            spawnIntervalId = window.setInterval(spawnPulse, PULSE_SPAWN_INTERVAL);
-            spawnPulse();
-        }
-
-        handleResize();
-        resizeHandler = handleResize;
-        startPulsesCallback = startPulses;
-        window.addEventListener('resize', handleResize);
-
-        gridIntervalId = window.setInterval(() => {
-            if (gridComplete) {
-                clearInterval(gridIntervalId);
-                gridCanvas!.style.animation = 'none';
-                gridCanvas!.style.opacity = CANVAS_OPACITY;
-                pulseCanvas!.style.animation = 'none';
-                pulseCanvas!.style.opacity = CANVAS_OPACITY;
-
-                return;
-            }
-
-            const ctx = gridCtx!;
-            const h = gridCanvas!.height;
-            const w = gridCanvas!.width;
-
-            ctx.lineWidth = GRID_LINE_WIDTH;
-            ctx.strokeStyle = cyan15;
-
-            if (horizontalLines < maxHorizontalLines) {
-                drawLine(ctx, 0, horizontalLines * GRID_SIZE, w, horizontalLines * GRID_SIZE);
-                horizontalLines++;
-            } else if (verticalLines < maxVerticalLines) {
-                drawLine(ctx, verticalLines * GRID_SIZE, 0, verticalLines * GRID_SIZE, h);
-                verticalLines++;
-            } else {
-                gridComplete = true;
-            }
-        }, GRID_DRAW_INTERVAL);
-    }
-
     function initScrollArrow() {
-        const arrow = document.querySelector('.hero__arrow');
+        arrow = document.querySelector<HTMLElement>('.hero__arrow');
 
         if (!arrow) return;
 
-        function handleScroll() {
-            if (!arrowVisible) return;
+        window.addEventListener('scroll', handleScroll, { passive: true, signal: controller.signal });
 
-            (arrow as HTMLElement).style.opacity = window.scrollY > SCROLL_THRESHOLD ? '0' : '1';
-        }
-
-        scrollHandler = handleScroll;
-        window.addEventListener('scroll', handleScroll, { passive: true });
+        if (reducedMotionQuery.matches) showArrow();
     }
 
     function initTypewriter() {
-        const tagline = document.querySelector('.hero__tagline') as HTMLElement | null;
-        const title = document.querySelector('.hero__title') as HTMLElement | null;
+        tagline = document.querySelector<HTMLElement>('.hero__tagline');
+        title = document.querySelector<HTMLElement>('.hero__title');
 
         if (!title || title.dataset.typed) return;
 
-        let charIndex = 0;
-        let cursorSpan: HTMLSpanElement | null = null;
-        let textSpan: HTMLSpanElement | null = null;
+        characterIndex = 0;
+        cursorSpan = title.querySelector<HTMLSpanElement>('.hero__cursor');
+        textSpan = title.querySelector<HTMLSpanElement>('.hero__text');
+        title.dataset.typed = 'true';
 
-        function typeNextChar() {
-            if (charIndex < TITLE_TEXT.length) {
-                if (textSpan) textSpan.textContent = TITLE_TEXT.slice(0, charIndex + 1);
+        if (reducedMotionQuery.matches) {
+            if (textSpan) textSpan.textContent = TITLE_TEXT;
 
-                charIndex++;
-                setTimeout(typeNextChar, TYPING_INTERVAL);
-            } else {
-                if (cursorSpan) cursorSpan.remove();
+            title.style.filter = 'none';
+            cursorSpan?.remove();
+            revealTagline();
 
-                title!.style.filter = 'blur(0px)';
-
-                setTimeout(() => {
-                    if (tagline) {
-                        tagline.style.opacity = '1';
-                        tagline.style.transition = 'opacity 1s ease-out';
-                    }
-                }, TAGLINE_FADE_DELAY);
-
-                setTimeout(() => {
-                    title!.style.animation = `hero__title ${TITLE_SHIMMER_DURATION}s ease-in-out infinite`;
-                }, TITLE_SHIMMER_DELAY);
-
-                setTimeout(() => {
-                    const arrow = document.querySelector('.hero__arrow') as HTMLElement | null;
-
-                    if (arrow) arrow.style.opacity = '1';
-
-                    arrowVisible = true;
-                }, ARROW_SHOW_DELAY);
-
-                setTimeout(() => {
-                    startPulsesCallback?.();
-                }, ARROW_SHOW_DELAY + PULSE_START_DELAY);
-            }
+            return;
         }
 
-        title.dataset.typed = 'true';
-        title.style.filter = `blur(${TITLE_INITIAL_BLUR}px)`;
-        title.style.transition = 'filter 1.5s ease-out';
-
-        setTimeout(() => {
-            title!.textContent = '';
-            cursorSpan = document.createElement('span');
-            cursorSpan.className = 'hero__cursor';
-            cursorSpan.textContent = '|';
-            textSpan = document.createElement('span');
-            textSpan.className = 'hero__text';
-            title!.append(textSpan, cursorSpan);
-            setTimeout(typeNextChar, TYPING_START_DELAY);
-        }, SEQUENCE_START_DELAY);
+        scheduleTimeout(typeNextCharacter, TYPING_START_DELAY);
     }
 
-    document.addEventListener('astro:page-load', init);
+    function pickGridX() {
+        return Math.floor(Math.random() * maxVerticalLineCount) * GRID_SIZE;
+    }
+
+    function pickGridY() {
+        return Math.floor(Math.random() * maxHorizontalLineCount) * GRID_SIZE;
+    }
+
+    function revealCanvases() {
+        if (!gridCanvas || !pulseCanvas) return;
+
+        gridCanvas.dataset.revealed = 'true';
+        pulseCanvas.dataset.revealed = 'true';
+    }
+
+    function revealTagline() {
+        if (!tagline) return;
+
+        tagline.style.opacity = '1';
+        tagline.style.transition = `opacity ${TAGLINE_FADE_DURATION}s ease-out`;
+    }
+
+    function scheduleTimeout(callback: () => void, delay: number) {
+        timeoutIds.push(window.setTimeout(callback, delay));
+    }
+
+    function showArrow() {
+        if (!arrow) return;
+
+        arrow.style.opacity = '1';
+        isArrowVisible = true;
+    }
+
+    function spawnPulse() {
+        if (!gridCanvas || pulses.length >= MAX_PULSES) return;
+
+        const edge = Math.floor(Math.random() * EDGE_COUNT);
+
+        let direction: Direction;
+        let x: number;
+        let y: number;
+
+        switch (edge) {
+            case EDGE_LEFT:
+                direction = 'right';
+                x = 0;
+                y = pickGridY();
+                break;
+            case EDGE_TOP:
+                direction = 'down';
+                x = pickGridX();
+                y = 0;
+                break;
+            case EDGE_RIGHT:
+                direction = 'left';
+                x = gridCanvas.width;
+                y = pickGridY();
+                break;
+            default:
+                direction = 'up';
+                x = pickGridX();
+                y = gridCanvas.height;
+        }
+
+        pulses.push({ direction, trail: [], x, y });
+    }
+
+    function startPulses() {
+        cancelAnimationFrame(animationFrameId);
+        clearInterval(spawnIntervalId);
+        animatePulses();
+        spawnPulse();
+        spawnIntervalId = window.setInterval(spawnPulse, PULSE_SPAWN_INTERVAL);
+    }
+
+    function startShimmer() {
+        if (!title) return;
+
+        title.style.animation = `hero__shimmer ${TITLE_SHIMMER_DURATION}s ease-in-out infinite`;
+    }
+
+    function typeNextCharacter() {
+        if (characterIndex < TITLE_TEXT.length) {
+            if (textSpan) textSpan.textContent = TITLE_TEXT.slice(0, characterIndex + 1);
+
+            characterIndex++;
+            scheduleTimeout(typeNextCharacter, TYPING_INTERVAL);
+
+            return;
+        }
+
+        cursorSpan?.remove();
+
+        if (title) title.style.filter = 'blur(0)';
+
+        scheduleTimeout(revealTagline, TAGLINE_FADE_DELAY);
+        scheduleTimeout(startShimmer, TITLE_SHIMMER_DELAY);
+        scheduleTimeout(showArrow, ARROW_SHOW_DELAY);
+        scheduleTimeout(startPulses, ARROW_SHOW_DELAY + PULSE_START_DELAY);
+    }
+
+    document.addEventListener('astro:page-load', initHero);
 </script>
