@@ -119,6 +119,7 @@ describe('initMotion', () => {
 
     test('kills every scroll trigger returned by getAll', async () => {
         const { initMotion } = await loadMotion();
+
         const triggers = [buildKillable(), buildKillable()];
 
         state.scrollTriggers = triggers;
@@ -131,6 +132,7 @@ describe('initMotion', () => {
 
     test('kills the live scroll triggers again on a second run', async () => {
         const { initMotion } = await loadMotion({ elements: [new ElementStub()] });
+
         const trigger = buildKillable();
 
         state.scrollTriggers = [trigger];
@@ -170,7 +172,7 @@ describe('initMotion with reduced motion', () => {
         );
     });
 
-    test('reveals every element with a single set call and registers no tweens', async () => {
+    test('reveals every element with one set call apiece and registers no tweens', async () => {
         const elements = [new ElementStub([new ElementStub()], STAGGER_ATTRIBUTE_VALUE), new ElementStub()];
 
         const { initMotion } = await loadMotion({ elements, prefersReducedMotion: true });
@@ -182,8 +184,9 @@ describe('initMotion with reduced motion', () => {
         expect(gsapStub.to).not.toHaveBeenCalled();
     });
 
-    test('kills the live scroll triggers before revealing', async () => {
+    test('kills the live scroll triggers on a reduced motion run', async () => {
         const { initMotion } = await loadMotion({ elements: [new ElementStub()], prefersReducedMotion: true });
+
         const trigger = buildKillable();
 
         state.scrollTriggers = [trigger];

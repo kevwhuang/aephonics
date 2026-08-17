@@ -22,6 +22,7 @@ const STATIC_ASSETS = [
 async function expectJsonNotFound(response: APIResponse, label: string) {
     expect(response.status(), `status for ${label}`).toBe(404);
     expect(response.headers()['content-type'], `content type for ${label}`).toContain('application/json');
+
     expect(await response.json(), `body for ${label}`).toEqual({ error: 'Not found' });
 }
 
@@ -75,7 +76,7 @@ test.describe('static assets', () => {
 });
 
 test.describe('api', () => {
-    test('returns a json 404 for every unknown api path on get', async ({ request }) => {
+    test('returns a json 404 for bare, shallow, and deep unknown api paths on get', async ({ request }) => {
         for (const path of API_PATHS) {
             const response = await request.get(path);
 
@@ -83,11 +84,21 @@ test.describe('api', () => {
         }
     });
 
-    test('returns a json 404 for every unknown api path on post', async ({ request }) => {
+    test('returns a json 404 for bare, shallow, and deep unknown api paths on post', async ({ request }) => {
         for (const path of API_PATHS) {
             const response = await request.post(path, { data: {} });
 
             await expectJsonNotFound(response, `post ${path}`);
         }
+    });
+
+    test('rejects a form-encoded cross-site post with a 403', async ({ request }) => {
+        const response = await request.post(API_PATHS[0], {
+            form: { probe: 'value' },
+            headers: { origin: 'https://evil.example' },
+        });
+
+        expect(response.status()).toBe(403);
+        expect(response.headers()['content-type']).not.toContain('application/json');
     });
 });

@@ -13,7 +13,7 @@ const HOVER_EFFECTS = [
 ] as const;
 
 const LINK = '<a class="active:opacity-70 focus-visible:bg-white-20 focus-visible:border-cyan-80 focus-visible:text-cyan-80 focus-visible:text-shadow-[0_0_1.25rem_var(--color-cyan-80)] hover:bg-white-20 hover:border-cyan-80 hover:text-cyan-80 hover:text-shadow-[0_0_1.25rem_var(--color-cyan-80)] inline-block min-h-[clamp(2.75rem,calc(2.5rem+1.25vw),3.5rem)] px-[clamp(1.25rem,calc(1rem+1.25vw),2rem)] py-4 border border-white-20 font-mono text-base tracking-[0.2em] uppercase text-white-60 duration-(--duration-fast) ease-[ease] transition-[background-color,border-color,color,opacity,text-shadow]" aria-label="Return to home" href="/">Return</a>';
-const REVEAL = '<div class="text-center" data-scroll="up">';
+const REVEAL = '<div class="text-center" data-scroll>';
 const SECTION = '<section class="section flex flex-1 items-center justify-center" aria-labelledby="error-server-title">';
 
 describe('ErrorServer', () => {

@@ -22,7 +22,7 @@ test.describe('404 page', () => {
         await expect(page.locator('h1')).toHaveCount(1);
     });
 
-    test('returns a 404 status for deep unknown paths', async ({ page }) => {
+    test('returns a 404 status for a deep unknown path', async ({ page }) => {
         const response = await page.goto(DEEP_NOT_FOUND_PATH);
 
         expect(response?.status()).toBe(404);

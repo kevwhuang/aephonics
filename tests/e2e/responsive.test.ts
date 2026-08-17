@@ -13,8 +13,17 @@ const PAGES = [
 ] as const;
 
 const PROPORTION_MIN_HEIGHT = 400;
+const SCRIPT_TIMEOUT = 20_000;
 const VIEWPORT_HEIGHT = 800;
 const WIDTHS = [320, 375, 767, 768, 769, 1_023, 1_024, 1_025, 1_280, 1_440] as const;
+
+function countHiddenScrollElements(page: Page) {
+    return page.evaluate(() => [...document.querySelectorAll('[data-scroll], [data-scroll-stagger] > *')].filter((element) => {
+        const style = getComputedStyle(element);
+
+        return style.opacity === '0' || style.visibility === 'hidden';
+    }).length);
+}
 
 async function getHeroGaps(page: Page) {
     const arrow = await page.locator(`${ARROW_SELECTOR} svg`).boundingBox();
@@ -32,7 +41,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('responsive layout', () => {
     for (const { name, path } of PAGES) {
-        test(`${name} page has no horizontal overflow at any width`, async ({ page }) => {
+        test(`${name} page fits every width with scroll content visible`, async ({ page }) => {
             await page.setViewportSize({ height: VIEWPORT_HEIGHT, width: WIDTHS[0] });
             await page.goto(path);
             await page.locator('main').waitFor();
@@ -45,6 +54,10 @@ test.describe('responsive layout', () => {
                 );
 
                 expect(delta, `horizontal overflow at width ${width}`).toBeLessThanOrEqual(0);
+
+                await expect
+                    .poll(() => countHiddenScrollElements(page), { message: `hidden scroll content at width ${width}`, timeout: SCRIPT_TIMEOUT })
+                    .toBe(0);
             }
         });
     }

@@ -50,7 +50,7 @@ test.describe('index page', () => {
         await expect(page).toHaveTitle('Aephonics');
     });
 
-    test('shows the hero heading with its accessible label above the tagline tags', async ({ page }) => {
+    test('shows the hero heading with its accessible label and the tagline tags', async ({ page }) => {
         const title = page.locator('#hero-title');
 
         await expect(title).toBeVisible();

@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 const BASE_URL = 'https://aephonics.com';
+const PROBE_TIMEOUT = 15_000;
 const PROD_TIMEOUT = 60_000;
 
 const SECURITY_HEADERS = {
@@ -12,7 +13,23 @@ const SECURITY_HEADERS = {
     'x-frame-options': 'sameorigin',
 } as const;
 
+let isProdReachable = false;
+
 test.describe.configure({ timeout: PROD_TIMEOUT });
+
+test.beforeAll(async ({ request }) => {
+    try {
+        const response = await request.get(`${BASE_URL}/`, { timeout: PROBE_TIMEOUT });
+
+        isProdReachable = response.ok();
+    } catch {
+        isProdReachable = false;
+    }
+});
+
+test.beforeEach(() => {
+    test.skip(!isProdReachable, `production origin ${BASE_URL} is unreachable`);
+});
 
 test.describe('production pages', () => {
     test('serves the home page with the bare site title and section hooks', async ({ request }) => {
@@ -33,6 +50,7 @@ test.describe('production pages', () => {
 
         expect(response.status()).toBe(404);
         expect(response.headers()['content-type']).toContain('text/html');
+
         expect(await response.text()).toContain('<title>Page Not Found \u2014 Aephonics</title>');
     });
 
@@ -64,6 +82,7 @@ test.describe('production api', () => {
 
         expect(response.status()).toBe(404);
         expect(response.headers()['content-type']).toContain('application/json');
+
         expect(await response.json()).toEqual({ error: 'Not found' });
     });
 });

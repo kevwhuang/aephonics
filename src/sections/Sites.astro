@@ -1,6 +1,8 @@
 ---
 import IconArrowUpRight from '@components/IconArrowUpRight.astro';
 
+const CLASS_CARD = 'sites__card active:scale-[0.99] focus-visible:-translate-y-1 hover:-translate-y-1 block group isolate overflow-hidden relative h-full min-h-[clamp(6rem,calc(5.3333rem+3.3333vw),8rem)] p-[clamp(1.5rem,calc(0.6667rem+4.1667vw),4rem)] border border-white-10 bg-white-5';
+
 const SITES = [
     {
         color: 'var(--color-cyan)',
@@ -32,14 +34,14 @@ const SITES = [
 <section class="section" aria-label="Site directory">
     <ul
         class="shell grid grid-cols-2 gap-[clamp(1.5rem,calc(1rem+2.5vw),3rem)] list-none max-md:grid-cols-1"
-        data-scroll="up"
+        data-scroll
         data-scroll-stagger="0.1"
     >
         {
             SITES.map(({ color, description, href, title }) => (
                 <li>
                     <a
-                        class="sites__card active:scale-[0.99] focus-visible:-translate-y-1 hover:-translate-y-1 block group overflow-hidden relative isolate h-full min-h-[clamp(6rem,calc(5.3333rem+3.3333vw),8rem)] p-[clamp(1.5rem,calc(0.6667rem+4.1667vw),4rem)] border border-white-10 bg-white-5"
+                        class={CLASS_CARD}
                         aria-label={`Visit ${title}`}
                         href={href}
                         rel="noopener"

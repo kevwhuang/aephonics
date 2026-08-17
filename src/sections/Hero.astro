@@ -9,21 +9,21 @@ import IconArrowDown from '@components/IconArrowDown.astro';
     <canvas class="hero__grid absolute inset-0" aria-hidden="true" />
     <canvas class="hero__pulses absolute inset-0" aria-hidden="true" />
     <div
-        class="hero__content place-self-center relative z-[1] px-[clamp(1rem,calc(0.5rem+2.5vw),2.5rem)] text-center"
+        class="hero__content place-self-center relative z-[1] px-(--shell-pad) text-center"
     >
         <h1
             id="hero-title"
             class="hero__title mb-[clamp(1rem,calc(0.3333rem+3.3333vw),3rem)] font-extralight leading-none text-[min(clamp(2.5rem,calc(-0.6667rem+15.8333vw),12rem),26svh)] tracking-wide uppercase bg-clip-text text-transparent drop-shadow-[0_0_2.5rem_var(--color-white-10)] select-none"
             aria-label="Aephonics"
         >
-            <span class="hero__text" /><span class="hero__cursor">|</span>
+            <span class="hero__text" /><span class="hero__cursor text-white">|</span>
         </h1>
         <ul
-            class="hero__tagline flex justify-center gap-[0.9em] font-mono list-none lowercase text-[clamp(0.875rem,calc(0.5833rem+1.4583vw),1.75rem)] tracking-[clamp(0.25rem,calc(0.1667rem+0.4167vw),0.5rem)] opacity-0 select-none"
+            class="hero__tagline flex justify-center gap-(--hero-tag-gap) font-mono list-none lowercase text-[clamp(0.875rem,calc(0.5833rem+1.4583vw),1.75rem)] tracking-[clamp(0.25rem,calc(0.1667rem+0.4167vw),0.5rem)] opacity-0 select-none"
         >
-            <li class="hero__tag hero__tag--atx before:text-zinc-600 text-pink-70 text-shadow-[0_0_0.9375rem_var(--color-pink-30)]">atx</li>
-            <li class="hero__tag hero__tag--syntax before:text-zinc-600 text-indigo-70 text-shadow-[0_0_0.9375rem_var(--color-indigo-30)]">syntax</li>
-            <li class="hero__tag hero__tag--wavs before:text-zinc-600 text-orange-70 text-shadow-[0_0_0.9375rem_var(--color-orange-30)]">wavs</li>
+            <li class="hero__tag hero__tag--atx before:text-zinc-600 text-pink-70 text-shadow-[0_0_1rem_var(--color-pink-30)]">atx</li>
+            <li class="hero__tag hero__tag--syntax before:text-zinc-600 text-indigo-70 text-shadow-[0_0_1rem_var(--color-indigo-30)]">syntax</li>
+            <li class="hero__tag hero__tag--wavs before:text-zinc-600 text-orange-70 text-shadow-[0_0_1rem_var(--color-orange-30)]">wavs</li>
         </ul>
     </div>
     <div
@@ -36,7 +36,6 @@ import IconArrowDown from '@components/IconArrowDown.astro';
 <style>
     .hero__cursor {
         animation: hero__blink 0.5s steps(1) infinite;
-        color: var(--color-white);
     }
 
     .hero__grid,
@@ -53,14 +52,18 @@ import IconArrowDown from '@components/IconArrowDown.astro';
 
     .hero__tag + .hero__tag::before {
         content: '/';
-        padding-right: 0.9em;
+        padding-right: var(--hero-tag-gap);
+    }
+
+    .hero__tagline {
+        --hero-tag-gap: 0.9em;
     }
 
     .hero__title {
         background-image: linear-gradient(90deg, var(--color-white-75) 0%, var(--color-white-75) 40%, var(--color-white) 50%, var(--color-white-75) 60%, var(--color-white-75) 100%);
         background-size: 250% 100%;
         filter: blur(0.5rem);
-        transition: filter 1.5s ease-out;
+        transition: filter var(--duration-reveal) ease-out;
     }
 
     @keyframes hero__blink {
@@ -116,7 +119,7 @@ import IconArrowDown from '@components/IconArrowDown.astro';
         up: { x: 0, y: -1 },
     };
 
-    const EDGE_COUNT = 4;
+    const EDGES = 4;
     const EDGE_LEFT = 0;
     const EDGE_RIGHT = 2;
     const EDGE_TOP = 1;
@@ -255,9 +258,9 @@ import IconArrowDown from '@components/IconArrowDown.astro';
     function drawGridLines(width: number, height: number) {
         if (!gridContext) return;
 
-        gridContext.clearRect(0, 0, width, height);
         gridContext.lineWidth = GRID_LINE_WIDTH;
         gridContext.strokeStyle = cyan15;
+        gridContext.clearRect(0, 0, width, height);
 
         for (let y = 0; y <= height; y += GRID_SIZE) {
             drawLine(0, y, width, y);
@@ -457,7 +460,7 @@ import IconArrowDown from '@components/IconArrowDown.astro';
     function spawnPulse() {
         if (!gridCanvas || pulses.length >= MAX_PULSES) return;
 
-        const edge = Math.floor(Math.random() * EDGE_COUNT);
+        const edge = Math.floor(Math.random() * EDGES);
 
         let direction: Direction;
         let x: number;

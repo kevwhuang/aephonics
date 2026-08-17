@@ -4,7 +4,7 @@ import type { Locator, Page } from '@playwright/test';
 
 const ARROW_SELECTOR = '.hero__arrow';
 const CARD_SELECTOR = '[data-scroll-stagger] > li';
-const HERO_CANVAS_COUNT = 2;
+const HERO_CANVASES = 2;
 const HIDDEN_CARD_OPACITIES = [0, 0, 0, 0] as const;
 const HIDDEN_TRANSFORM = 'matrix(1, 0, 0, 1, 0, 60)';
 const LIST_SELECTOR = 'ul[data-scroll]';
@@ -13,14 +13,30 @@ const POLL_TIGHT = { intervals: [100], timeout: 10_000 };
 const PULSE_SAMPLE_FRAMES = 12;
 const RESIZED_VIEWPORT = { height: 900, width: 1_000 } as const;
 const REVEALED_CARD_OPACITIES = [1, 1, 1, 1] as const;
-const SCROLL_ELEMENT_COUNT = 1;
+const SCROLL_ELEMENTS = 1;
 const SCROLL_PAST_ARROW = 200;
 const SETTLED_TRANSFORM = 'matrix(1, 0, 0, 1, 0, 0)';
-const SITE_CARD_COUNT = 4;
+const SITE_CARDS = 4;
 const TITLE_TEXT = 'Aephonics';
 
 const HIDDEN_CARD_TRANSFORMS = [HIDDEN_TRANSFORM, HIDDEN_TRANSFORM, HIDDEN_TRANSFORM, HIDDEN_TRANSFORM] as const;
 const SETTLED_CARD_TRANSFORMS = [SETTLED_TRANSFORM, SETTLED_TRANSFORM, SETTLED_TRANSFORM, SETTLED_TRANSFORM] as const;
+
+function areInlineShown(page: Page) {
+    return page.locator('[data-scroll]').evaluateAll(elements => elements.every(
+        element => element instanceof HTMLElement && element.style.opacity === '1',
+    ));
+}
+
+function areRevealed(page: Page) {
+    return page.locator('[data-scroll], [data-scroll-stagger] > *').evaluateAll(
+        elements => elements.every((element) => {
+            const style = getComputedStyle(element);
+
+            return style.opacity === '1' && style.transform === 'none';
+        }),
+    );
+}
 
 function countPaintedPulseFrames(page: Page) {
     return page.evaluate(frames => new Promise<number>((resolve) => {
@@ -28,31 +44,34 @@ function countPaintedPulseFrames(page: Page) {
         const MISSING_CANVAS = -1;
         const PIXEL_STRIDE = 4;
 
-        const canvas = document.querySelector<HTMLCanvasElement>('.hero__pulses');
+        const pulseCanvas = document.querySelector<HTMLCanvasElement>('.hero__pulses');
 
-        const context = canvas?.getContext('2d');
+        const pulseContext = pulseCanvas?.getContext('2d');
 
-        if (!canvas || !context || canvas.height === 0 || canvas.width === 0) {
+        if (!pulseCanvas || !pulseContext || pulseCanvas.height === 0 || pulseCanvas.width === 0) {
             resolve(MISSING_CANVAS);
 
             return;
         }
 
+        const context = pulseContext;
+        const { height, width } = pulseCanvas;
+
         let painted = 0;
         let remaining = frames;
 
         function sample() {
-            const { data } = context.getImageData(0, 0, canvas.width, canvas.height);
+            const { data } = context.getImageData(0, 0, width, height);
 
             for (let index = ALPHA_CHANNEL_OFFSET; index < data.length; index += PIXEL_STRIDE) {
                 if (data[index] !== 0) {
-                    painted += 1;
+                    painted++;
 
                     break;
                 }
             }
 
-            remaining -= 1;
+            remaining--;
 
             if (remaining <= 0) {
                 resolve(painted);
@@ -70,7 +89,7 @@ function countPaintedPulseFrames(page: Page) {
 async function expectCardsHidden(page: Page) {
     const cards = page.locator(CARD_SELECTOR);
 
-    await expect(cards, 'site card count').toHaveCount(SITE_CARD_COUNT);
+    await expect(cards, 'site card count').toHaveCount(SITE_CARDS);
     await expect.poll(() => getTransforms(cards), POLL).toEqual(HIDDEN_CARD_TRANSFORMS);
     expect(await getOpacities(page), 'card opacities before the reveal').toEqual(HIDDEN_CARD_OPACITIES);
 }
@@ -83,25 +102,9 @@ async function expectCardsRevealed(page: Page) {
 }
 
 async function expectScrollContentShown(page: Page) {
-    function areInlineShown() {
-        return page.locator('[data-scroll]').evaluateAll(elements => elements.every(
-            element => element instanceof HTMLElement && element.style.opacity === '1',
-        ));
-    }
-
-    function areRevealed() {
-        return page.locator('[data-scroll], [data-scroll-stagger] > *').evaluateAll(
-            elements => elements.every((element) => {
-                const style = getComputedStyle(element);
-
-                return style.opacity === '1' && style.transform === 'none';
-            }),
-        );
-    }
-
-    await expect(page.locator('[data-scroll]'), 'scroll element count').toHaveCount(SCROLL_ELEMENT_COUNT);
-    await expect.poll(areInlineShown, POLL).toBe(true);
-    await expect.poll(areRevealed, POLL).toBe(true);
+    await expect(page.locator('[data-scroll]'), 'scroll element count').toHaveCount(SCROLL_ELEMENTS);
+    await expect.poll(() => areInlineShown(page), POLL).toBe(true);
+    await expect.poll(() => areRevealed(page), POLL).toBe(true);
 }
 
 function getHeroSizes(page: Page) {
@@ -148,7 +151,7 @@ test.describe('scroll motion', () => {
         await page.goto('/');
 
         await expect.poll(() => page.locator('.hero__title').textContent(), POLL).toBe(TITLE_TEXT);
-        await expect(page.locator('canvas[data-revealed]')).toHaveCount(HERO_CANVAS_COUNT);
+        await expect(page.locator('canvas[data-revealed]')).toHaveCount(HERO_CANVASES);
         await expect.poll(() => getOpacity(page.locator('.hero__tagline')), POLL).toBe('1');
         await expect.poll(() => getOpacity(page.locator(ARROW_SELECTOR)), POLL).toBe('1');
     });
@@ -168,7 +171,7 @@ test.describe('scroll motion', () => {
 
         await page.goto('/');
 
-        await expect(page.locator('canvas[data-revealed]')).toHaveCount(HERO_CANVAS_COUNT);
+        await expect(page.locator('canvas[data-revealed]')).toHaveCount(HERO_CANVASES);
 
         await page.setViewportSize(RESIZED_VIEWPORT);
 
@@ -176,7 +179,9 @@ test.describe('scroll motion', () => {
             canvases: [RESIZED_VIEWPORT, RESIZED_VIEWPORT],
             section: RESIZED_VIEWPORT,
         });
-        await expect(page.locator('canvas[data-revealed]')).toHaveCount(HERO_CANVAS_COUNT);
+
+        await expect(page.locator('canvas[data-revealed]')).toHaveCount(HERO_CANVASES);
+
         expect(errors, 'console errors after the resize').toEqual([]);
     });
 
@@ -277,7 +282,7 @@ test.describe('scroll motion under reduced motion', () => {
     test('reveals both hero canvases at once and leaves the pulse canvas static', async ({ page }) => {
         await page.goto('/');
 
-        await expect(page.locator('canvas[data-revealed]')).toHaveCount(HERO_CANVAS_COUNT);
+        await expect(page.locator('canvas[data-revealed]')).toHaveCount(HERO_CANVASES);
         await expect.poll(() => countPaintedPulseFrames(page), POLL).toBe(0);
     });
 });

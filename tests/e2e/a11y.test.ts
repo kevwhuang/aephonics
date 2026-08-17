@@ -39,11 +39,9 @@ test.describe('document structure', () => {
             const structure = await page.evaluate(() => ({
                 footerParent: document.querySelector('footer')?.parentElement?.tagName,
                 h1Count: document.querySelectorAll('h1').length,
-                headingLevels: [...document.querySelectorAll('h1, h2, h3, h4, h5, h6')]
-                    .map(heading => Number(heading.tagName.slice(1))),
+                headingLevels: [...document.querySelectorAll('h1, h2, h3, h4, h5, h6')].map(heading => Number(heading.tagName.slice(1))),
                 mainCount: document.querySelectorAll('main, [role="main"]').length,
-                missingAltCount: [...document.querySelectorAll('img')]
-                    .filter(image => !image.hasAttribute('alt')).length,
+                missingAltCount: [...document.querySelectorAll('img')].filter(image => !image.hasAttribute('alt')).length,
                 nestedLandmarkCount: [...document.querySelectorAll('main footer, main header')]
                     .filter(element => !element.closest('article, aside, nav, section')).length,
                 unresolvedLabelIds: [...document.querySelectorAll('[aria-labelledby]')]
@@ -80,7 +78,7 @@ test.describe('keyboard navigation', () => {
             expect(restingOutlines[target.selector], `resting outline on ${target.name}`).toMatch(/^none /);
         }
 
-        for (let press = 0; press < MAX_TAB_PRESSES && remaining.size > 0; press += 1) {
+        for (let press = 0; press < MAX_TAB_PRESSES && remaining.size > 0; press++) {
             await page.keyboard.press('Tab');
 
             for (const selector of [...remaining.keys()]) {
@@ -91,8 +89,7 @@ test.describe('keyboard navigation', () => {
                 const focusedOutline = await getOutline(page, selector);
 
                 expect(focusedOutline, `focus indicator on ${remaining.get(selector)}`).toBe(FOCUS_OUTLINE);
-                expect(focusedOutline, `focus indicator on ${remaining.get(selector)}`)
-                    .not.toBe(restingOutlines[selector]);
+                expect(focusedOutline, `focus indicator on ${remaining.get(selector)}`).not.toBe(restingOutlines[selector]);
                 remaining.delete(selector);
             }
         }
@@ -131,7 +128,7 @@ test.describe('page titles', () => {
         expect(new Set(titles).size).toBe(titles.length);
         expect(titles[0]).toBe(HOME_TITLE);
 
-        for (let index = 1; index < titles.length; index += 1) {
+        for (let index = 1; index < titles.length; index++) {
             expect(titles[index], `title suffix on ${PUBLIC_PATHS[index]}`).toMatch(TITLE_PATTERN);
         }
     });

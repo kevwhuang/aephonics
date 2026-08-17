@@ -3,8 +3,8 @@ import { beforeAll, describe, expect, test } from 'vitest';
 
 import Sites from '../../src/sections/Sites.astro';
 
-const CARD = '<a class="sites__card active:scale-[0.99] focus-visible:-translate-y-1 hover:-translate-y-1 block group overflow-hidden relative isolate h-full min-h-[clamp(6rem,calc(5.3333rem+3.3333vw),8rem)] p-[clamp(1.5rem,calc(0.6667rem+4.1667vw),4rem)] border border-white-10 bg-white-5"';
-const DATA_SCROLL_HOOK_COUNT = 2;
+const CARD = '<a class="sites__card active:scale-[0.99] focus-visible:-translate-y-1 hover:-translate-y-1 block group isolate overflow-hidden relative h-full min-h-[clamp(6rem,calc(5.3333rem+3.3333vw),8rem)] p-[clamp(1.5rem,calc(0.6667rem+4.1667vw),4rem)] border border-white-10 bg-white-5"';
+const DATA_SCROLL_HOOKS = 2;
 
 const DECORATIONS = [
     { hook: 'sites__glow', markup: '<div class="sites__glow group-focus-visible:opacity-100 group-hover:opacity-100 -inset-0.5 absolute duration-(--duration-base) ease-[ease] opacity-0 transition-opacity" aria-hidden="true"' },
@@ -13,7 +13,7 @@ const DECORATIONS = [
 ] as const;
 
 const HOVER_EFFECTS_PER_CARD = 9;
-const LIST = '<ul class="shell grid grid-cols-2 gap-[clamp(1.5rem,calc(1rem+2.5vw),3rem)] list-none max-md:grid-cols-1" data-scroll="up" data-scroll-stagger="0.1"';
+const LIST = '<ul class="shell grid grid-cols-2 gap-[clamp(1.5rem,calc(1rem+2.5vw),3rem)] list-none max-md:grid-cols-1" data-scroll data-scroll-stagger="0.1"';
 
 const SITES = [
     {
@@ -44,7 +44,7 @@ const SITES = [
 
 let html: string;
 
-function findCards() {
+function getCards() {
     return html.split(CARD).slice(1);
 }
 
@@ -60,20 +60,20 @@ describe('Sites', () => {
         expect(html.split('<section').length - 1).toBe(1);
     });
 
-    test('marks the only card list for a staggered upward scroll reveal inside the shell', () => {
+    test('marks the only card list for a staggered scroll reveal inside the shell', () => {
         expect(html).toContain(LIST);
         expect(html.split('<ul ').length - 1).toBe(1);
-        expect(html.split('data-scroll').length - 1).toBe(DATA_SCROLL_HOOK_COUNT);
+        expect(html.split('data-scroll').length - 1).toBe(DATA_SCROLL_HOOKS);
     });
 
     test('renders one list item and one card per site', () => {
         expect(html.split('<li ').length - 1).toBe(SITES.length);
-        expect(findCards()).toHaveLength(SITES.length);
+        expect(getCards()).toHaveLength(SITES.length);
         expect(html.split('<a ').length - 1).toBe(SITES.length);
     });
 
     test('gives every card its href, accessible name, accent, title, and description in order', () => {
-        for (const [index, card] of findCards().entries()) {
+        for (const [index, card] of getCards().entries()) {
             const site = SITES[index];
 
             expect(card, site.title).toContain(`aria-label="Visit ${site.title}"`);
@@ -85,7 +85,7 @@ describe('Sites', () => {
     });
 
     test('opens every card in a new tab without leaking the opener', () => {
-        for (const card of findCards()) {
+        for (const card of getCards()) {
             expect(card).toContain('rel="noopener"');
             expect(card).toContain('target="_blank"');
         }
@@ -95,8 +95,7 @@ describe('Sites', () => {
     });
 
     test('mirrors every card hover effect on focus visible', () => {
-        const hoverEffects = [...html.matchAll(/ (group-)?hover:(\S+)/g)]
-            .map(match => `${match[1] ?? ''}hover:${match[2]}`);
+        const hoverEffects = [...html.matchAll(/ (group-)?hover:(\S+)/g)].map(match => `${match[1] ?? ''}hover:${match[2]}`);
 
         expect(hoverEffects).toHaveLength(SITES.length * HOVER_EFFECTS_PER_CARD);
 
