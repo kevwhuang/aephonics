@@ -2,6 +2,18 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { beforeAll, describe, expect, test, vi } from 'vitest';
 
 import Layout from '../../src/Layout.astro';
+import { ROUTES } from '../../src/lib/constants';
+
+interface StructuredData {
+    '@context': string;
+    '@graph': {
+        '@type': string;
+        'author'?: { '@type': string; 'name': string };
+        'inLanguage'?: string;
+        'itemListElement'?: unknown[];
+        'name'?: string;
+    }[];
+}
 
 const DESCRIPTION = 'Aephonics is Kevin Huang\'s personal hub linking his four project sites: algorithm practice, a web engineering portfolio, a music catalog, and a travel map.';
 const FOOTER = '<footer class="section border-t border-white-10 bg-zinc-950"';
@@ -109,14 +121,17 @@ describe('Layout', () => {
     test('embeds parseable json-ld describing the site', () => {
         const match = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
 
-        const jsonLd = match ? JSON.parse(match[1]) : null;
+        const jsonLd = match ? JSON.parse(match[1]) as StructuredData : null;
+
+        const itemList = jsonLd?.['@graph'].find(node => node['@type'] === 'ItemList');
+        const website = jsonLd?.['@graph'].find(node => node['@type'] === 'WebSite');
 
         expect(jsonLd).not.toBeNull();
-        expect(jsonLd['@context']).toBe('https://schema.org');
-        expect(jsonLd['@type']).toBe('WebSite');
-        expect(jsonLd.author).toEqual({ '@type': 'Person', 'name': 'Kevin Huang' });
-        expect(jsonLd.inLanguage).toBe('en');
-        expect(jsonLd.name).toBe('Aephonics');
+        expect(jsonLd?.['@context']).toBe('https://schema.org');
+        expect(itemList?.itemListElement).toHaveLength(ROUTES.length);
+        expect(website?.author).toEqual({ '@type': 'Person', 'name': 'Kevin Huang' });
+        expect(website?.inLanguage).toBe('en');
+        expect(website?.name).toBe('Aephonics');
         expect(html.split('application/ld+json').length - 1).toBe(1);
     });
 
