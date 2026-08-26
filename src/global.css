@@ -24,14 +24,8 @@
     --color-white-50: #ffffff80;
     --color-white-60: #ffffff99;
     --color-white-75: #ffffffbf;
-    --font-mono:
-        'Geist Mono',
-        ui-monospace,
-        monospace;
-    --font-sans:
-        'Geist Sans',
-        system-ui,
-        sans-serif;
+    --font-mono: var(--font-geist-mono);
+    --font-sans: var(--font-geist-sans);
 }
 
 :root {

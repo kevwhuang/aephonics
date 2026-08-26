@@ -23,7 +23,7 @@ async function expectJsonNotFound(response: APIResponse, label: string) {
     expect(response.status(), `status for ${label}`).toBe(404);
     expect(response.headers()['content-type'], `content type for ${label}`).toContain('application/json');
 
-    expect(await response.json(), `body for ${label}`).toEqual({ error: 'Not found' });
+    expect(await response.json(), `body for ${label}`).toEqual({ error: 'Not found.' });
 }
 
 function expectSecurityHeaders(response: APIResponse, label: string) {

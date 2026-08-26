@@ -30,7 +30,7 @@ async function getHeroGaps(page: Page) {
     const tagline = await page.locator('.hero__tagline').boundingBox();
     const title = await page.locator('.hero__title').boundingBox();
 
-    if (!arrow || !tagline || !title) throw new Error('hero elements are not visible');
+    if (!arrow || !tagline || !title) throw new Error('Hero elements are not visible.');
 
     return { arrowGap: arrow.y - (tagline.y + tagline.height), stackGap: tagline.y - (title.y + title.height) };
 }

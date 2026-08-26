@@ -54,7 +54,7 @@ describe('Layout', () => {
         expect(html).toContain('<html lang="en">');
         expect(html).toContain('<head>');
         expect(html).toContain('</head>');
-        expect(html).toContain('<body class="flex flex-col min-h-svh antialiased font-sans bg-zinc-950 text-white">');
+        expect(html).toContain('<body class="flex flex-col min-h-svh antialiased bg-zinc-950 text-white">');
         expect(html).toContain('</body></html>');
     });
 

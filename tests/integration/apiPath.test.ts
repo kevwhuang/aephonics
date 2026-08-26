@@ -30,7 +30,7 @@ describe('api path', () => {
 
         const result: { error: string } = await response.json();
 
-        expect(result).toEqual({ error: 'Not found' });
+        expect(result).toEqual({ error: 'Not found.' });
     });
 
     test('sets a json content type header', async () => {
